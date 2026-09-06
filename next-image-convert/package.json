@@ -1,0 +1,22 @@
+{
+  "name": "next-image-convert",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "type": "module",
+  "dependencies": {
+    "next": "16.1.6",
+    "wasm-html-to-image": "^0.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "25.3.5",
+    "@types/react": "19.2.14",
+    "file-loader": "6.2.0",
+    "postcss": "8.5.8",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3"
+  }
+}

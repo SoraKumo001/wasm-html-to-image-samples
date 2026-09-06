@@ -1,0 +1,4 @@
+allowBuilds:
+  sharp: true
+minimumReleaseAgeExclude:
+  - wasm-html-to-image@0.1.1

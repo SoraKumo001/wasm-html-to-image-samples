@@ -1,0 +1,9 @@
+node_modules/
+.next/
+build/
+dist/
+.wrangler/
+.react-router/
+image_output/
+*.log
+.DS_Store

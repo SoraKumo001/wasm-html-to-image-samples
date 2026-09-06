@@ -1,0 +1,15 @@
+name = "cloudflare-image"
+main = "src/index.ts"
+compatibility_date = "2023-12-29"
+compatibility_flags = ["nodejs_compat"]
+
+[observability.logs]
+enabled = true
+
+[limits]
+cpu_ms = 10000
+
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = false

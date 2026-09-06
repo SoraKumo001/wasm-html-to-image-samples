@@ -1,0 +1,10 @@
+packages:
+  - '*'
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+  workerd: true
+minimumReleaseAgeExclude:
+  - wasm-html-to-image@0.1.1

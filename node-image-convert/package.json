@@ -1,0 +1,19 @@
+{
+  "name": "node-image-convert",
+  "scripts": {
+    "dev": "tsx src",
+    "dev:worker": "tsx src/worker",
+    "build": "tsc -b",
+    "start": "node dist",
+    "start:worker": "node dist/worker"
+  },
+  "type": "module",
+  "dependencies": {
+    "wasm-html-to-image": "^0.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "25.3.5",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
+  }
+}
