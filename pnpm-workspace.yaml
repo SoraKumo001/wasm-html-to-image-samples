@@ -8,3 +8,4 @@ allowBuilds:
   workerd: true
 minimumReleaseAgeExclude:
   - wasm-html-to-image@0.1.1
+  - '@cloudflare/workers-types@5.20260906.1'

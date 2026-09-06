@@ -1,6 +1,0 @@
-allowBuilds:
-  esbuild: true
-  sharp: true
-  workerd: true
-minimumReleaseAgeExclude:
-  - wasm-html-to-image@0.1.1
