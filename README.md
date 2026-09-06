@@ -26,7 +26,7 @@ pnpm -r build
 | [**`next-image-convert`**](./next-image-convert/)                       | Client-Side Image Converter | Next.js 16 (App Router) | Turbopack + Tailwind CSS v4 | `wasm-html-to-image/workers`                                |
 | [**`react-router-image-convert`**](./react-router-image-convert/)       | Client-Side Image Converter | React Router v7         | Vite 7 + Tailwind CSS v4    | `wasm-html-to-image/workers`                                |
 | [**`node-image-convert`**](./node-image-convert/)                       | CLI Batch Converter         | Node.js (ESM)           | TypeScript (`tsc -b`), tsx  | `wasm-html-to-image/single`<br>`wasm-html-to-image/workers` |
-| [**`cloudflare-ogp`**](./cloudflare-ogp/)                               | Dynamic OGP Generator       | Cloudflare Workers      | Wrangler                    | `wasm-html-to-image/workerd`<br>`wasm-html-to-image/react`  |
+| [**`cloudflare-ogp`**](./cloudflare-ogp/)                               | Dynamic OGP Generator       | Cloudflare Workers (Preact) | Wrangler                    | `wasm-html-to-image/workerd`<br>`wasm-html-to-image/preact`<br>`wasm-html-to-image/tailwind` |
 | [**`cloudflare-image-optimization`**](./cloudflare-image-optimization/) | Image Optimization Proxy    | Cloudflare Workers      | Wrangler, Jest              | `wasm-html-to-image/workerd`                                |
 | [**`deno-ogp`**](./deno-ogp/)                                           | Dynamic OGP Generator       | Deno                    | Deno CLI                    | `npm:wasm-html-to-image`<br>`npm:wasm-html-to-image/react`  |
 | [**`deno-image-optimization`**](./deno-image-optimization/)             | Image Optimization Proxy    | Deno                    | Deno CLI                    | `npm:wasm-html-to-image`                                    |
@@ -100,14 +100,21 @@ Batch image conversion CLI utility on Node.js with single-threaded and multi-thr
 
 ### 5. [cloudflare-ogp](./cloudflare-ogp/)
 
-Dynamic Social Preview (OGP) image generation running at the edge.
+Dynamic Social Preview (OGP) image generation running at the edge using Preact and Tailwind CSS.
 
 - **Runtime**: Cloudflare Workers (`workerd`)
-- **Build Tool**: Wrangler, React 19
-- **Package Feature**: Uses `toHtml` from `wasm-html-to-image/react` to convert JSX components into HTML and renders directly to PNG using `wasm-html-to-image/workerd`. Eliminates the need for external tools like Satori or Yoga.
-- **Run**:
+- **Build Tool**: Wrangler, Preact 10, TypeScript
+- **Package Feature**:
+  - Uses `toHtml` from `wasm-html-to-image/preact` to render Preact JSX components to HTML.
+  - Uses `createCSS` from `wasm-html-to-image/tailwind` to extract utility classes and dynamically generate Tailwind styles.
+  - Renders to PNG at the edge via `wasm-html-to-image/workerd`.
+- **Run & Test**:
   ```bash
+  # Start dev server
   pnpm --filter cloudflare-ogp dev
+
+  # Run smoke test
+  pnpm --filter cloudflare-ogp test
   ```
 
 ---

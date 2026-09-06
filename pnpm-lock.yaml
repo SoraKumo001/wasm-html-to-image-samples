@@ -12,7 +12,7 @@ importers:
     dependencies:
       wasm-html-to-image:
         specifier: ^0.1.1
-        version: 0.1.1(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 0.1.1(@unocss/core@66.10.0)(@unocss/preset-wind4@66.10.0)(preact-render-to-string@6.7.0)(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20260307.1
@@ -68,12 +68,21 @@ importers:
 
   cloudflare-ogp:
     dependencies:
+      '@unocss/core':
+        specifier: ^66.6.5
+        version: 66.10.0
+      '@unocss/preset-wind4':
+        specifier: ^66.6.5
+        version: 66.10.0
       preact:
         specifier: ^10.29.8
-        version: 10.29.8
+        version: 10.29.8(preact-render-to-string@6.7.0)
+      preact-render-to-string:
+        specifier: ^6.6.0
+        version: 6.7.0(preact@10.29.8)
       wasm-html-to-image:
         specifier: ^0.1.1
-        version: 0.1.1(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 0.1.1(@unocss/core@66.10.0)(@unocss/preset-wind4@66.10.0)(preact-render-to-string@6.7.0)(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^5.20260906.1
@@ -92,7 +101,7 @@ importers:
     dependencies:
       wasm-html-to-image:
         specifier: ^0.1.1
-        version: 0.1.1(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 0.1.1(@unocss/core@66.10.0)(@unocss/preset-wind4@66.10.0)(preact-render-to-string@6.7.0)(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
 
   deno-ogp:
     dependencies:
@@ -104,7 +113,7 @@ importers:
         version: 19.2.8(react@19.2.8)
       wasm-html-to-image:
         specifier: ^0.1.1
-        version: 0.1.1(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 0.1.1(@unocss/core@66.10.0)(@unocss/preset-wind4@66.10.0)(preact-render-to-string@6.7.0)(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@types/react':
         specifier: ^19.2.14
@@ -120,7 +129,7 @@ importers:
         version: 16.1.6(@babel/core@7.29.7(supports-color@10.2.2))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       wasm-html-to-image:
         specifier: ^0.1.1
-        version: 0.1.1(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 0.1.1(@unocss/core@66.10.0)(@unocss/preset-wind4@66.10.0)(preact-render-to-string@6.7.0)(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@tailwindcss/postcss':
         specifier: 4.2.1
@@ -148,7 +157,7 @@ importers:
     dependencies:
       wasm-html-to-image:
         specifier: ^0.1.1
-        version: 0.1.1(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 0.1.1(@unocss/core@66.10.0)(@unocss/preset-wind4@66.10.0)(preact-render-to-string@6.7.0)(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@types/node':
         specifier: 25.3.5
@@ -170,7 +179,7 @@ importers:
         version: 19.2.8(react@19.2.8)
       wasm-html-to-image:
         specifier: ^0.1.1
-        version: 0.1.1(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 0.1.1(@unocss/core@66.10.0)(@unocss/preset-wind4@66.10.0)(preact-render-to-string@6.7.0)(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.3.3
@@ -216,7 +225,7 @@ importers:
         version: 7.18.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       wasm-html-to-image:
         specifier: ^0.1.1
-        version: 0.1.1(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 0.1.1(@unocss/core@66.10.0)(@unocss/preset-wind4@66.10.0)(preact-render-to-string@6.7.0)(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20260307.1
@@ -2421,6 +2430,18 @@ packages:
   '@ungap/structured-clone@1.4.0':
     resolution: {integrity: sha512-1mEZtMKPM09vDmQt5y7YvmN2+DFTP7Tg0EWXdic8/C6VRnpb33e4ghisCIE3WZjsE2N8mf+QV1Zqh7ZFYLWInQ==}
 
+  '@unocss/core@66.10.0':
+    resolution: {integrity: sha512-d3IMOBqbAdkq4zWiV469o1Q4qizdKbD/wkbvLaq7W6qf1aDrZ/dqg29aWMj23Nb48NVDNhsQAPUhQre/IZ04mQ==}
+
+  '@unocss/extractor-arbitrary-variants@66.10.0':
+    resolution: {integrity: sha512-5yv7dC2BmY2o6GXtH5dyadoRmNFlZBAtEKItxHLE0jGPmgoFl5MUwlebRSCrlrPy4Z21bal/ve2yxP9SfLIiig==}
+
+  '@unocss/preset-wind4@66.10.0':
+    resolution: {integrity: sha512-6AB+3Ep13Hbc1GbPQYlxIhMSVFbI3crFfQvhsBdJzH/qlqSxcKb/wQhG00Sh7eHyQRI20bYSjSzrIEjBJaHmiA==}
+
+  '@unocss/rule-utils@66.10.0':
+    resolution: {integrity: sha512-J0UCAAIQ7U18zEnYm9YDGzmmjExtANX0MYvtn/Wrz4ZztjIGyLKvykX5NtGg27rp4bPpwY/i4vw978vxNupc3w==}
+
   '@unrs/resolver-binding-android-arm-eabi@1.12.2':
     resolution: {integrity: sha512-g5T90pqg1bo/7mytQx6F4iBNC0Wsh9cu+z9veDbFjc7HjpesJFWD7QMS0NGStXM075+7dJPPVvBbpZlnrdpi/w==}
     cpu: [arm]
@@ -4084,6 +4105,9 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
+  magic-string@1.2.3:
+    resolution: {integrity: sha512-Bpb0W2TbLKOZ7vJnOUnVRGq3WL2p+ISV29M6hYPL1AFCpyKZpdr5ytiXoTSSxRVhg8YW7f65+6gbG8WG6PCa/g==}
+
   make-dir@4.0.0:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
     engines: {node: '>=10'}
@@ -4435,6 +4459,11 @@ packages:
   postcss@8.5.8:
     resolution: {integrity: sha512-OW/rX8O/jXnm82Ey1k44pObPtdblfiuWnrd8X7GJ7emImCOstunGbXUpp7HdBrFQX6rJzn3sPT397Wp5aCwCHg==}
     engines: {node: ^10 || ^12 || >=14}
+
+  preact-render-to-string@6.7.0:
+    resolution: {integrity: sha512-Z4WR8fmLMRpdYqJ9i7vrlXSsSrxVJydwrkEXHapexfARbWfGb7vGcnvNQnIzN0cXciMVOlz/XLoiMCi9gUsy9Q==}
+    peerDependencies:
+      preact: '>=10 || >= 11.0.0-0'
 
   preact@10.29.8:
     resolution: {integrity: sha512-ej2aVZ+vZ8WO7tvlQWRM9N63A0KzF9q4mWJfDUHgYaIofWY9hu74QdnQrjoPMmZi2/nZ5gN0bJCQF49xQqx09Q==}
@@ -6975,6 +7004,23 @@ snapshots:
 
   '@ungap/structured-clone@1.4.0': {}
 
+  '@unocss/core@66.10.0': {}
+
+  '@unocss/extractor-arbitrary-variants@66.10.0':
+    dependencies:
+      '@unocss/core': 66.10.0
+
+  '@unocss/preset-wind4@66.10.0':
+    dependencies:
+      '@unocss/core': 66.10.0
+      '@unocss/extractor-arbitrary-variants': 66.10.0
+      '@unocss/rule-utils': 66.10.0
+
+  '@unocss/rule-utils@66.10.0':
+    dependencies:
+      '@unocss/core': 66.10.0
+      magic-string: 1.2.3
+
   '@unrs/resolver-binding-android-arm-eabi@1.12.2':
     optional: true
 
@@ -8995,6 +9041,10 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.6.0
 
+  magic-string@1.2.3:
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.6.0
+
   make-dir@4.0.0:
     dependencies:
       semver: 7.8.5
@@ -9293,7 +9343,13 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  preact@10.29.8: {}
+  preact-render-to-string@6.7.0(preact@10.29.8):
+    dependencies:
+      preact: 10.29.8(preact-render-to-string@6.7.0)
+
+  preact@10.29.8(preact-render-to-string@6.7.0):
+    optionalDependencies:
+      preact-render-to-string: 6.7.0(preact@10.29.8)
 
   prelude-ls@1.2.1: {}
 
@@ -10061,12 +10117,15 @@ snapshots:
       terser: 5.51.2
       tsx: 4.21.0
 
-  wasm-html-to-image@0.1.1(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+  wasm-html-to-image@0.1.1(@unocss/core@66.10.0)(@unocss/preset-wind4@66.10.0)(preact-render-to-string@6.7.0)(preact@10.29.8)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
     dependencies:
       commander: 15.0.0
       worker-lib: 2.2.1
     optionalDependencies:
-      preact: 10.29.8
+      '@unocss/core': 66.10.0
+      '@unocss/preset-wind4': 66.10.0
+      preact: 10.29.8(preact-render-to-string@6.7.0)
+      preact-render-to-string: 6.7.0(preact@10.29.8)
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
