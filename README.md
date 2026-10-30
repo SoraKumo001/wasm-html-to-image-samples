@@ -23,6 +23,7 @@ pnpm -r build
 | Sample                                                            | Category                    | Framework / Runtime         | Build Tool / Bundler        | Subpath / Entry Point                                                                        |
 | :---------------------------------------------------------------- | :-------------------------- | :-------------------------- | :-------------------------- | :------------------------------------------------------------------------------------------- |
 | [**`playground`**](./playground/)                                 | Interactive Web App         | Browser (React 19)          | Vite 8 + Tailwind CSS v4    | `wasm-html-to-image/workers`                                                                 |
+| [**`mermaid-compare`**](./mermaid-compare/)                       | Visual & Perf Comparison    | Browser (React 19)          | Vite 8 + Tailwind CSS v4    | `wasm-html-to-image/workers`                                                                 |
 | [**`next-image-convert`**](./next-image-convert/)                 | Client-Side Image Converter | Next.js 16 (App Router)     | Turbopack + Tailwind CSS v4 | `wasm-html-to-image/workers`                                                                 |
 | [**`react-router-image-convert`**](./react-router-image-convert/) | Client-Side Image Converter | React Router v7             | Vite 7 + Tailwind CSS v4    | `wasm-html-to-image/workers`                                                                 |
 | [**`node-image-convert`**](./node-image-convert/)                 | CLI Batch Converter         | Node.js (ESM)               | TypeScript (`tsc -b`), tsx  | `wasm-html-to-image/single`<br>`wasm-html-to-image/workers`                                  |
@@ -47,7 +48,25 @@ Interactive web UI for testing HTML-to-image rendering and image format optimiza
 
 ---
 
-### 2. [next-image-convert](./next-image-convert/)
+### 2. [mermaid-compare](./mermaid-compare/)
+
+Interactive visual and performance comparison app between `wasm-html-to-image`'s native Mermaid renderer and the official `mermaid` package.
+
+- **Runtime**: Browser SPA (React 19)
+- **Build Tool**: Vite 8, Tailwind CSS v4, TypeScript
+- **Package Feature**:
+  - Compares layout, fonts, and arrows using Side-by-Side and draggable Split Slider views.
+  - Profiles rendering latency (ms) in real-time.
+  - Tests themes (`light`, `dark`, `forest`, `dracula`, etc.) and error recovery modes (`strict`, `compat`, `recover`).
+  - Supports exporting diagrams as SVG or raster (PNG, WebP).
+- **Run**:
+  ```bash
+  pnpm --filter mermaid-compare dev
+  ```
+
+---
+
+### 3. [next-image-convert](./next-image-convert/)
 
 Batch image format conversion (AVIF, WebP, JPEG, PNG) on Next.js.
 
@@ -61,7 +80,7 @@ Batch image format conversion (AVIF, WebP, JPEG, PNG) on Next.js.
 
 ---
 
-### 3. [react-router-image-convert](./react-router-image-convert/)
+### 4. [react-router-image-convert](./react-router-image-convert/)
 
 Batch image format conversion using React Router v7.
 
@@ -75,7 +94,7 @@ Batch image format conversion using React Router v7.
 
 ---
 
-### 4. [node-image-convert](./node-image-convert/)
+### 5. [node-image-convert](./node-image-convert/)
 
 Batch image conversion CLI utility on Node.js with single-threaded and multi-threaded modes.
 
@@ -96,7 +115,7 @@ Batch image conversion CLI utility on Node.js with single-threaded and multi-thr
 
 ---
 
-### 5. [cloudflare-ogp](./cloudflare-ogp/)
+### 6. [cloudflare-ogp](./cloudflare-ogp/)
 
 Dynamic Social Preview (OGP) image generation running at the edge using Preact and Tailwind CSS.
 
