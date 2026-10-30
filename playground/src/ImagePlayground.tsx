@@ -175,7 +175,7 @@ const AsyncImage: FC<{
           quality,
           speed,
           animation,
-          width: size[0] || 0,
+          width: size[0] || undefined,
           height: size[1] || undefined,
         });
         const elapsed = performance.now() - t;

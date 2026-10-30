@@ -122,21 +122,26 @@ const AsyncImage: FC<{
       await waitReady();
       const buffer = await file.arrayBuffer();
       const t = performance.now();
-      const image = await render({
-        value: buffer,
-        format,
-        fit,
-        quality,
-        speed,
-        animation,
-        width: size[0] || 0,
-        height: size[1] || 0,
-      });
-      const time = performance.now() - t;
-      setTime(time);
-      setImage(image);
-      if (image) {
-        onFinished?.({ image, format, speed, quality, animation, time });
+      try {
+        const image = await render({
+          value: buffer,
+          format,
+          fit,
+          quality,
+          speed,
+          animation,
+          width: size[0] || undefined,
+          height: size[1] || undefined,
+        });
+        const time = performance.now() - t;
+        setTime(time);
+        setImage(image);
+        if (image) {
+          onFinished?.({ image, format, speed, quality, animation, time });
+        }
+      } catch (err) {
+        console.error("Conversion failed:", err);
+        setImage(undefined);
       }
     };
     convert();

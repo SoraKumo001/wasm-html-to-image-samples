@@ -1,4 +1,4 @@
-import { render } from 'wasm-html-to-image/workerd';
+import { render } from 'wasm-html-to-image';
 
 const isValidUrl = (url: string) => {
 	try {
