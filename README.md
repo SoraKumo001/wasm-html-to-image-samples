@@ -27,8 +27,7 @@ pnpm -r build
 | [**`react-router-image-convert`**](./react-router-image-convert/) | Client-Side Image Converter | React Router v7             | Vite 7 + Tailwind CSS v4    | `wasm-html-to-image/workers`                                                                 |
 | [**`node-image-convert`**](./node-image-convert/)                 | CLI Batch Converter         | Node.js (ESM)               | TypeScript (`tsc -b`), tsx  | `wasm-html-to-image/single`<br>`wasm-html-to-image/workers`                                  |
 | [**`cloudflare-ogp`**](./cloudflare-ogp/)                         | Dynamic OGP Generator       | Cloudflare Workers (Preact) | Wrangler                    | `wasm-html-to-image/workerd`<br>`wasm-html-to-image/preact`<br>`wasm-html-to-image/tailwind` |
-| [**`deno-ogp`**](./deno-ogp/)                                     | Dynamic OGP Generator       | Deno                        | Deno CLI                    | `npm:wasm-html-to-image`<br>`npm:wasm-html-to-image/react`                                   |
-| [**`deno-image-optimization`**](./deno-image-optimization/)       | Image Optimization Proxy    | Deno                        | Deno CLI                    | `npm:wasm-html-to-image`                                                                     |
+                                                                   |
 
 ---
 
