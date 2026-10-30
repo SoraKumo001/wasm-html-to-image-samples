@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       wasm-html-to-image:
-        specifier: ^1.0.26
-        version: 1.0.26
+        specifier: ^1.0.27
+        version: 1.0.27
     devDependencies:
       '@types/node':
         specifier: 26.6.6
@@ -487,8 +487,8 @@ packages:
     resolution: {integrity: sha512-4Nsy8K5Tr6SPDH9jhKJOHf7ChDrc1zufZTVSF7x72hwuEXBqxqk9G6cK+K2NRUtB3iELRJqjXb4JPDMBjMTl2Q==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
 
-  wasm-html-to-image@1.0.26:
-    resolution: {integrity: sha512-t5sTmYYkfmIurM2H1L6LILqiBDlEhSNlwz3nVjV9odo0Ju0CBE2Ox/qoRR2bA7fvZogrmo3/N9VOqXtCN3mE+Q==}
+  wasm-html-to-image@1.0.27:
+    resolution: {integrity: sha512-vunYXFYPZEbfrQhg+f5gQHW/F11CEF0dDjiEHNMwD3/5blstS50Lk379rbQwoEOKA9yEci3zFAHxn/mkR9f7gQ==}
     engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
@@ -924,7 +924,7 @@ snapshots:
       xml-name-validator: 5.0.0
     optional: true
 
-  wasm-html-to-image@1.0.26:
+  wasm-html-to-image@1.0.27:
     dependencies:
       commander: 15.0.0
       worker-lib: 2.2.1

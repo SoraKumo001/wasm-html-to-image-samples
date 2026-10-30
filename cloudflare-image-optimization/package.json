@@ -15,7 +15,7 @@
 		"@types/jest": "^30.0.0",
 		"@typescript-eslint/eslint-plugin": "^8.72.1",
 		"@typescript-eslint/parser": "^8.72.1",
-		"eslint": "10.13.0",
+		"eslint": "10.14.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-import-resolver-typescript": "^4.4.5",
 		"eslint-plugin-import": "^2.32.0",
@@ -29,7 +29,7 @@
 		"wrangler": "^4.156.0"
 	},
 	"dependencies": {
-		"wasm-html-to-image": "^1.0.26"
+		"wasm-html-to-image": "^1.0.27"
 	},
 	"main": "index.js",
 	"repository": "https://github.com/SoraKumo001/cloudflare-workers-image-optimization",
