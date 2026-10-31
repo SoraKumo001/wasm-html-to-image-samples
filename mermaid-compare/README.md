@@ -13,7 +13,9 @@ Interactive comparison app comparing [`wasm-html-to-image`](https://www.npmjs.co
 - **Side-by-Side & Split Slider Views**:
   - Compare diagram layout, node spacing, font rendering, and arrow routing side-by-side or using a real-time draggable overlay slider.
 - **Support for Key Diagram Types**:
-  - Pre-configured presets for Flowcharts, Sequence Diagrams, Class Diagrams, State Diagrams, ER Diagrams, and Charts (Pie, XY Chart).
+  - Pre-configured presets for Flowcharts, Sequence Diagrams, Class Diagrams, State Diagrams, ER Diagrams, Charts (Pie, XY Chart), and Multilingual diagrams.
+- **Multilingual & CJK Full Support**:
+  - Out-of-the-box support for Japanese (日本語), Chinese (中文), Korean (한국어), European accents, and emoji with accurate text measurement and line wrapping.
 - **Theme Testing**:
   - Compare themes: `light`, `dark`, `neutral`, `forest`, `nord`, `dracula`, `sepia`, etc.
 - **Performance Profiling**:
