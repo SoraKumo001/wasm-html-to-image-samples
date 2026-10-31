@@ -1,10 +1,13 @@
 import mermaid from "mermaid";
 import { normalizeSvg } from "./svgUtils.ts";
+import { officialThemeFor } from "./officialTheme.ts";
 
 export interface OfficialRenderResult {
   svg: string;
   durationMs: number;
   error?: string;
+  /** set when the official package has no theme of the requested name: the stand-in theme used */
+  approximateOf?: string;
 }
 
 let mermaidCounter = 0;
@@ -16,22 +19,13 @@ export async function renderOfficial(
   const startTime = performance.now();
   const renderId = `mermaid-official-${++mermaidCounter}`;
 
-  // Map theme name to official mermaid theme
-  let officialTheme: "default" | "dark" | "forest" | "neutral" | "base" = "default";
-  if (theme === "dark" || theme === "dracula" || theme === "solarized-dark" || theme === "rose-pine") {
-    officialTheme = "dark";
-  } else if (theme === "forest") {
-    officialTheme = "forest";
-  } else if (theme === "neutral" || theme === "sepia") {
-    officialTheme = "neutral";
-  } else {
-    officialTheme = "default";
-  }
+  const choice = officialThemeFor(theme);
+  const approximateOf = choice.exact ? undefined : choice.name;
 
   try {
     mermaid.initialize({
       startOnLoad: false,
-      theme: officialTheme,
+      theme: choice.name,
       securityLevel: "loose",
       fontFamily: "ui-sans-serif, system-ui, sans-serif",
     });
@@ -41,6 +35,7 @@ export async function renderOfficial(
     return {
       svg: normalizeSvg(svg),
       durationMs,
+      approximateOf,
     };
   } catch (err: unknown) {
     const durationMs = performance.now() - startTime;

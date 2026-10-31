@@ -23,7 +23,10 @@ Interactive comparison app comparing [`wasm-html-to-image`](https://www.npmjs.co
 
 ## 🚀 Getting Started
 
-From the workspace root:
+This copy uses the published `wasm-html-to-image` package. To try unreleased engine changes, point it at a checkout:
+`WASM_LOCAL=<path of the wasm-html-to-image checkout> pnpm dev` (rebuild the checkout first with `pnpm build`).
+
+From the repository root:
 
 ```bash
 # Run local dev server
@@ -34,3 +37,22 @@ pnpm --filter mermaid-compare build
 ```
 
 Then open `http://localhost:3001` in your browser.
+
+The settings are kept in the address bar, so a link reproduces the screen. Values equal to the default are left out.
+
+| Query | Values | Default |
+| :--- | :--- | :--- |
+| `preset` | a preset id (for example `state-order`) | `flowchart-simple` |
+| `code` | the Mermaid source, when it differs from the preset | the preset's |
+| `theme` | a theme name (`light`, `dark`, `forest`, ...) | `light` |
+| `view` | `side-by-side`, `slider`, `wasm-only`, `official-only` | `side-by-side` |
+| `scale` | `fit`, `original` | `fit` |
+| `bg`, `bgColor` | `light`, `dark`, `gray`, `checker`, `custom`; `#rrggbb` for `custom` | `light` |
+| `mode` | `strict`, `compat`, `recover` | the preset's recommended mode |
+| `format` | `svg`, `png`, `webp` | `svg` |
+| `directives` | `off` to ignore `%%{init}%%` | on |
+| `padding` | 0 to 200 | `16` |
+
+Open `http://localhost:3001/parity.html` for the theme colour report: it renders every preset in `light`, `dark`,
+`forest` and `neutral` with both renderers and lists the colour difference (CIE76 ΔE) of node, edge and text
+colours, plus the official theme variables (`window.__parity`). See `doc/design/mermaid-theme-parity.md`.

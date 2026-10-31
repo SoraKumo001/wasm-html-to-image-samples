@@ -62,6 +62,15 @@ export const MetricsPanel: React.FC<MetricsPanelProps> = ({
           )}
         </div>
 
+        {officialResult?.approximateOf && (
+          <span
+            className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-600"
+            title="The official package has no theme of this name; colors are not comparable"
+          >
+            Reference only: official "{officialResult.approximateOf}" stands in
+          </span>
+        )}
+
         {/* Comparative Badge */}
         {speedDiffText && !wasmResult?.error && !officialResult?.error && (
           <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-950 text-emerald-300 border border-emerald-800">
