@@ -145,6 +145,23 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Render</span>
           )}
         </button>
+
+        {/* npm Link */}
+        <a
+          href="https://www.npmjs.com/package/wasm-html-to-image"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="View wasm-html-to-image on npm"
+          className="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-900 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 text-slate-300 hover:text-white transition-colors text-xs font-medium cursor-pointer shrink-0"
+        >
+          <svg className="w-5 h-3 fill-[#cb3837] shrink-0" viewBox="0 0 780 250" aria-label="npm">
+            <path d="M240,250h100v-110h100v110h100V0H240V250z M340,50h100v90h-100V50z M0,250h200V0H0V250z M100,50h100v150h-100V50z M580,0v250h200V0H580z M680,150h-100V50h100V150z" />
+          </svg>
+          <span className="hidden sm:inline text-teal-300 font-mono text-[11px]">
+            wasm-html-to-image
+          </span>
+          <span className="sm:hidden text-slate-400 font-mono text-[10px]">npm</span>
+        </a>
       </div>
     </header>
   );
