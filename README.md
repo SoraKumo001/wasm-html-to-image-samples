@@ -59,9 +59,13 @@ Interactive visual and performance comparison app between `wasm-html-to-image`'s
   - Profiles rendering latency (ms) in real-time.
   - Tests themes (`light`, `dark`, `forest`, `dracula`, etc.) and error recovery modes (`strict`, `compat`, `recover`).
   - Supports exporting diagrams as SVG or raster (PNG, WebP).
-- **Run**:
+- **Deploy to Cloudflare**:
   ```bash
-  pnpm --filter mermaid-compare dev
+  # Cloudflare Workers (Static Assets)
+  pnpm --filter mermaid-compare deploy
+
+  # Or Cloudflare Pages
+  pnpm --filter mermaid-compare deploy:pages
   ```
 
 ---

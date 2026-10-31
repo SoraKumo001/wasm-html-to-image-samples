@@ -34,6 +34,23 @@ pnpm --filter mermaid-compare dev
 
 # Build production bundle
 pnpm --filter mermaid-compare build
+
+# Preview with Cloudflare Workers locally
+pnpm --filter mermaid-compare preview:worker
+```
+
+---
+
+## ☁️ Deploy to Cloudflare
+
+`mermaid-compare` is configured for **Cloudflare Workers Static Assets** (and Cloudflare Pages) using Wrangler.
+
+```bash
+# Deploy to Cloudflare Workers (Static Assets)
+pnpm --filter mermaid-compare deploy
+
+# Alternatively, deploy to Cloudflare Pages
+pnpm --filter mermaid-compare deploy:pages
 ```
 
 Then open `http://localhost:3001` in your browser.
