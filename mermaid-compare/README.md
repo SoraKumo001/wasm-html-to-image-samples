@@ -1,5 +1,7 @@
 # mermaid-compare
 
+https://mermaid-compare.mofon001.workers.dev/
+
 Interactive comparison app comparing [`wasm-html-to-image`](https://www.npmjs.com/package/wasm-html-to-image)'s native Mermaid diagram renderer with the official [`mermaid`](https://www.npmjs.com/package/mermaid) package.
 
 ---
