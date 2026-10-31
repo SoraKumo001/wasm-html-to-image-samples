@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "generate:ogp": "node scripts/generate-ogp.mjs",
+    "prebuild": "node scripts/generate-ogp.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "preview:worker": "wrangler dev",

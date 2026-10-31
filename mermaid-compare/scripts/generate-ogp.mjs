@@ -1,0 +1,360 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { render } from "wasm-html-to-image/single";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const publicDir = path.resolve(__dirname, "../public");
+
+async function main() {
+  await fs.mkdir(publicDir, { recursive: true });
+
+  const ogpSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#070a13" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#090d16" />
+    </linearGradient>
+
+    <!-- Card Background Gradient -->
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.98" />
+    </linearGradient>
+
+    <!-- Glow Orbs Gradients -->
+    <radialGradient id="cyanGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.32" />
+      <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="purpleGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="emeraldGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Title Gradient -->
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="55%" stop-color="#f0f9ff" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+
+    <!-- Slider Line Gradient -->
+    <linearGradient id="sliderLineGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.1" />
+      <stop offset="20%" stop-color="#38bdf8" stop-opacity="0.9" />
+      <stop offset="80%" stop-color="#38bdf8" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.1" />
+    </linearGradient>
+
+    <!-- Grid Pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="1" stroke-opacity="0.22" />
+    </pattern>
+
+    <!-- Card Shadow Filter -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+
+    <filter id="badgeGlow">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#38bdf8" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&amp;family=JetBrains+Mono:wght@500;700;800&amp;display=swap');
+    .font-sans { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', ui-monospace, Menlo, Monaco, Consolas, monospace; }
+  </style>
+
+  <!-- Background Base -->
+  <rect width="1200" height="630" fill="url(#bgGrad)" />
+
+  <!-- Ambient Glow Orbs -->
+  <circle cx="180" cy="130" r="380" fill="url(#cyanGlow)" />
+  <circle cx="1020" cy="160" r="420" fill="url(#purpleGlow)" />
+  <circle cx="700" cy="540" r="320" fill="url(#emeraldGlow)" />
+
+  <!-- Grid Overlay -->
+  <rect width="1200" height="630" fill="url(#grid)" />
+
+  <!-- Outer Frame Subtle Border -->
+  <rect x="20" y="20" width="1160" height="590" rx="20" fill="none" stroke="#334155" stroke-width="1.5" stroke-opacity="0.45" />
+
+  <!-- ================= LEFT COLUMN: INFO & BRANDING ================= -->
+  <g transform="translate(68, 72)" class="font-sans">
+    
+    <!-- Top Pill Badge: Project Category -->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="280" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.65" />
+      <circle cx="18" cy="17" r="4.5" fill="#38bdf8" filter="url(#badgeGlow)" />
+      <text x="32" y="22" fill="#93c5fd" font-size="12" font-weight="700" letter-spacing="1.5" class="font-mono">WASM-HTML-TO-IMAGE</text>
+    </g>
+
+    <!-- Main Title -->
+    <text x="0" y="98" fill="url(#titleGrad)" font-size="54" font-weight="900" letter-spacing="-1">
+      mermaid-compare
+    </text>
+
+    <!-- Subtitle -->
+    <text x="0" y="140" fill="#94a3b8" font-size="21" font-weight="600" letter-spacing="-0.2">
+      Interactive Visual Parity &amp; Latency Benchmark
+    </text>
+
+    <!-- Description -->
+    <text x="0" y="180" fill="#cbd5e1" font-size="15" font-weight="400">
+      <tspan x="0" dy="0">High-speed native WASM Mermaid renderer compared directly</tspan>
+      <tspan x="0" dy="24">with official Mermaid.js in side-by-side &amp; interactive slider views.</tspan>
+    </text>
+
+    <!-- Feature Badges Grid -->
+    <g transform="translate(0, 240)">
+      <!-- Feature 1 -->
+      <g transform="translate(0, 0)">
+        <rect x="0" y="0" width="215" height="36" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1" />
+        <circle cx="16" cy="18" r="4" fill="#38bdf8" />
+        <text x="28" y="23" fill="#e2e8f0" font-size="12.5" font-weight="600">Side-by-Side &amp; Slider</text>
+      </g>
+      <!-- Feature 2 -->
+      <g transform="translate(225, 0)">
+        <rect x="0" y="0" width="215" height="36" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1" />
+        <circle cx="16" cy="18" r="4" fill="#10b981" />
+        <text x="28" y="23" fill="#e2e8f0" font-size="12.5" font-weight="600">Zero-DOM WASM Engine</text>
+      </g>
+      <!-- Feature 3 -->
+      <g transform="translate(0, 46)">
+        <rect x="0" y="0" width="215" height="36" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1" />
+        <circle cx="16" cy="18" r="4" fill="#a855f7" />
+        <text x="28" y="23" fill="#e2e8f0" font-size="12.5" font-weight="600">CIE76 Color Parity ΔE</text>
+      </g>
+      <!-- Feature 4 -->
+      <g transform="translate(225, 46)">
+        <rect x="0" y="0" width="215" height="36" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1" />
+        <circle cx="16" cy="18" r="4" fill="#f59e0b" />
+        <text x="28" y="23" fill="#e2e8f0" font-size="12.5" font-weight="600">10+ Themes &amp; Export</text>
+      </g>
+    </g>
+
+    <!-- Bottom URL Link Pill -->
+    <g transform="translate(0, 400)">
+      <rect x="0" y="0" width="445" height="40" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1.5" />
+      <circle cx="20" cy="20" r="5" fill="#f97316" />
+      <text x="36" y="25" fill="#38bdf8" font-size="13.5" font-weight="600" class="font-mono">
+        https://mermaid-compare.mofon001.workers.dev
+      </text>
+    </g>
+  </g>
+
+  <!-- ================= RIGHT COLUMN: INTERACTIVE APP PREVIEW CARD ================= -->
+  <g transform="translate(585, 72)" filter="url(#shadow)">
+    <!-- Card Frame (Simulating the App comparison UI) -->
+    <rect x="0" y="0" width="545" height="475" rx="16" fill="url(#cardBg)" stroke="#334155" stroke-width="1.5" />
+
+    <!-- Card Header / Title Bar -->
+    <path d="M 0 16 Q 0 0 16 0 L 529 0 Q 545 0 545 16 L 545 42 L 0 42 Z" fill="#0f172a" />
+    <line x1="0" y1="42" x2="545" y2="42" stroke="#334155" stroke-width="1" />
+
+    <!-- macOS Style Dots -->
+    <circle cx="22" cy="21" r="5.5" fill="#ef4444" />
+    <circle cx="38" cy="21" r="5.5" fill="#f59e0b" />
+    <circle cx="54" cy="21" r="5.5" fill="#10b981" />
+
+    <!-- App Title in Window -->
+    <text x="80" y="25" fill="#94a3b8" font-size="12" font-weight="600" class="font-mono">
+      wasm-html-to-image vs official mermaid
+    </text>
+
+    <!-- Sub-header Toolbar inside card -->
+    <rect x="12" y="52" width="521" height="36" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+    
+    <!-- Left Renderer Label -->
+    <g transform="translate(20, 60)">
+      <rect x="0" y="0" width="138" height="20" rx="4" fill="#0284c7" fill-opacity="0.25" stroke="#0ea5e9" stroke-width="1" />
+      <text x="8" y="14" fill="#38bdf8" font-size="10.5" font-weight="700" class="font-sans">WASM Engine</text>
+    </g>
+    <!-- Latency Badge Left -->
+    <g transform="translate(168, 60)">
+      <!-- Lightning SVG Icon -->
+      <path d="M 5 1 L 0 8 L 4 8 L 3 15 L 9 6 L 5 6 Z" fill="#34d399" />
+      <text x="13" y="12" fill="#34d399" font-size="11.5" font-weight="700" class="font-mono">0.9 ms</text>
+    </g>
+
+    <!-- VS Divider in Header -->
+    <text x="272" y="74" fill="#64748b" font-size="11" font-weight="800" text-anchor="middle" class="font-mono">VS</text>
+
+    <!-- Right Renderer Label -->
+    <g transform="translate(320, 60)">
+      <rect x="0" y="0" width="128" height="20" rx="4" fill="#7c3aed" fill-opacity="0.2" stroke="#8b5cf6" stroke-width="1" />
+      <text x="8" y="14" fill="#c084fc" font-size="10.5" font-weight="700" class="font-sans">Official Mermaid</text>
+    </g>
+    <!-- Latency Badge Right -->
+    <text x="460" y="73" fill="#cbd5e1" font-size="11.5" font-weight="600" class="font-mono">18.2 ms</text>
+
+    <!-- Diagram Display Area -->
+    <rect x="12" y="98" width="521" height="330" rx="10" fill="#020617" stroke="#1e293b" stroke-width="1" />
+
+    <!-- Left Split (WASM Rendering Content) -->
+    <g transform="translate(24, 112)">
+      <!-- Input Node -->
+      <rect x="8" y="45" width="105" height="44" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="2" />
+      <text x="60" y="72" fill="#f8fafc" font-size="12" font-weight="600" text-anchor="middle" class="font-sans">Mermaid Code</text>
+
+      <!-- Arrow to WASM Engine -->
+      <path d="M 113 67 L 140 67" stroke="#38bdf8" stroke-width="2" />
+      <polygon points="142,67 134,63 134,71" fill="#38bdf8" />
+
+      <!-- WASM Core Node -->
+      <polygon points="185,35 235,67 185,99 135,67" fill="#0369a1" stroke="#38bdf8" stroke-width="2.5" />
+      <text x="185" y="63" fill="#ffffff" font-size="11.5" font-weight="800" text-anchor="middle" class="font-sans">WASM</text>
+      <text x="185" y="77" fill="#bae6fd" font-size="9.5" font-weight="700" text-anchor="middle" class="font-sans">Engine</text>
+    </g>
+
+    <!-- Right Split (Official & Outputs Content) -->
+    <g transform="translate(24, 112)">
+      <!-- Arrow from center to outputs -->
+      <path d="M 270 50 L 320 30 L 340 30" stroke="#38bdf8" stroke-width="2" fill="none" />
+      <polygon points="342,30 334,26 334,34" fill="#38bdf8" />
+
+      <!-- Node: Vector SVG -->
+      <rect x="345" y="10" width="145" height="42" rx="8" fill="#065f46" stroke="#34d399" stroke-width="2" />
+      <text x="417" y="32" fill="#ecfdf5" font-size="11.5" font-weight="700" text-anchor="middle" class="font-sans">Clean SVG (0-DOM)</text>
+      <text x="417" y="44" fill="#a7f3d0" font-size="8.5" font-weight="500" text-anchor="middle" class="font-sans">Pixel-Perfect Layout</text>
+
+      <!-- Arrow down to raster output -->
+      <path d="M 270 85 L 320 105 L 340 105" stroke="#38bdf8" stroke-width="2" fill="none" />
+      <polygon points="342,105 334,101 334,109" fill="#38bdf8" />
+
+      <!-- Node: PNG/WebP -->
+      <rect x="345" y="85" width="145" height="42" rx="8" fill="#1e1b4b" stroke="#818cf8" stroke-width="2" />
+      <text x="417" y="107" fill="#e0e7ff" font-size="11.5" font-weight="700" text-anchor="middle" class="font-sans">PNG / WebP</text>
+      <text x="417" y="119" fill="#c7d2fe" font-size="8.5" font-weight="500" text-anchor="middle" class="font-sans">Direct Native Encode</text>
+    </g>
+
+    <!-- Parity Metrics Box (Neatly centered in bottom of diagram area) -->
+    <g transform="translate(26, 260)">
+      <rect x="0" y="0" width="493" height="152" rx="8" fill="#0b1329" stroke="#1e293b" stroke-width="1" />
+      <text x="16" y="24" fill="#38bdf8" font-size="11.5" font-weight="700" class="font-mono">VISUAL PARITY &amp; DIAGNOSTIC REPORT</text>
+      
+      <!-- Metrics Row 1 -->
+      <g transform="translate(16, 46)">
+        <text x="0" y="0" fill="#94a3b8" font-size="11" class="font-sans">Node Geometry</text>
+        <text x="140" y="0" fill="#34d399" font-size="11" font-weight="700" class="font-mono">100% Match</text>
+
+        <text x="250" y="0" fill="#94a3b8" font-size="11" class="font-sans">Font Sizing</text>
+        <text x="375" y="0" fill="#34d399" font-size="11" font-weight="700" class="font-mono">Subpixel Parity</text>
+      </g>
+
+      <!-- Metrics Row 2 -->
+      <g transform="translate(16, 74)">
+        <text x="0" y="0" fill="#94a3b8" font-size="11" class="font-sans">CIE76 Color ΔE</text>
+        <text x="140" y="0" fill="#38bdf8" font-size="11" font-weight="700" class="font-mono">0.00 (Identical)</text>
+
+        <text x="250" y="0" fill="#94a3b8" font-size="11" class="font-sans">WASM Memory</text>
+        <text x="375" y="0" fill="#f59e0b" font-size="11" font-weight="700" class="font-mono">&lt; 3MB Binary</text>
+      </g>
+
+      <!-- Metrics Row 3 -->
+      <g transform="translate(16, 102)">
+        <text x="0" y="0" fill="#94a3b8" font-size="11" class="font-sans">Renderer Mode</text>
+        <text x="140" y="0" fill="#a855f7" font-size="11" font-weight="700" class="font-mono">strict | compat</text>
+
+        <text x="250" y="0" fill="#94a3b8" font-size="11" class="font-sans">Theme Support</text>
+        <text x="375" y="0" fill="#e2e8f0" font-size="11" font-weight="700" class="font-mono">10 Built-in</text>
+      </g>
+    </g>
+
+    <!-- Slider Divider Bar (Vertical split slider indicator) -->
+    <line x1="272" y1="98" x2="272" y2="250" stroke="url(#sliderLineGrad)" stroke-width="2" />
+
+    <!-- Split-Slider Handle Knob -->
+    <g transform="translate(272, 175)">
+      <circle cx="0" cy="0" r="15" fill="#0284c7" stroke="#e0f2fe" stroke-width="2.5" filter="url(#badgeGlow)" />
+      <!-- Left Arrow -->
+      <path d="M -5 0 L -1 -4 L -1 4 Z" fill="#ffffff" />
+      <!-- Right Arrow -->
+      <path d="M 5 0 L 1 -4 L 1 4 Z" fill="#ffffff" />
+    </g>
+
+    <!-- Status Bar inside Card -->
+    <g transform="translate(12, 436)">
+      <rect x="0" y="0" width="521" height="27" rx="0" fill="#090d16" />
+      <text x="14" y="17" fill="#64748b" font-size="10.5" font-weight="500" class="font-mono">
+        PRESET: flowchart-simple  |  THEME: dark  |  MODE: strict
+      </text>
+    </g>
+  </g>
+
+</svg>`;
+
+  // Write standalone SVG file
+  const svgPath = path.resolve(publicDir, "og-image.svg");
+  await fs.writeFile(svgPath, ogpSvg, "utf-8");
+  console.log(`Generated SVG: ${svgPath}`);
+
+  // Wrap SVG in HTML with Google Fonts link so that wasm-html-to-image resolves fonts
+  const renderHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; width: 1200px; height: 630px; overflow: hidden; background: #070a13; }
+  </style>
+</head>
+<body>
+  ${ogpSvg}
+</body>
+</html>`;
+
+  // Render to PNG using wasm-html-to-image
+  console.log("Rendering 1200x630 PNG with wasm-html-to-image (with Web Fonts)...");
+  const pngResult = await render({
+    value: renderHtml,
+    format: "png",
+    width: 1200,
+    height: 630,
+    quality: 95,
+  });
+
+  if (pngResult.data) {
+    const pngPath = path.resolve(publicDir, "og-image.png");
+    await fs.writeFile(pngPath, pngResult.data);
+    console.log(`Generated PNG: ${pngPath} (${pngResult.data.length} bytes)`);
+  }
+
+  // Create favicon.svg
+  const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="favBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#favBg)" />
+  <!-- Split comparison symbol with M shape -->
+  <path d="M 14 46 L 14 20 L 26 34 L 38 20 L 50 34 L 50 46" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="26" cy="34" r="3.5" fill="#38bdf8" />
+  <circle cx="38" cy="20" r="3.5" fill="#f43f5e" />
+</svg>`;
+
+  const favSvgPath = path.resolve(publicDir, "favicon.svg");
+  await fs.writeFile(favSvgPath, faviconSvg, "utf-8");
+  console.log(`Generated favicon: ${favSvgPath}`);
+
+  console.log("All OGP assets generated successfully!");
+}
+
+main().catch((err) => {
+  console.error("Error generating OGP assets:", err);
+  process.exit(1);
+});
