@@ -1,10 +1,9 @@
 import {
   render,
-  renderMermaidWith,
   MERMAID_THEMES,
   type MermaidTheme,
   type OutputFormat,
-} from "wasm-html-to-image/workerd";
+} from "wasm-html-to-image";
 
 const DEFAULT_MERMAID = `graph LR
   Client[Client 💻] -->|Query| Worker[Cloudflare Workers ⚡]
@@ -28,7 +27,7 @@ export default {
   async fetch(
     request: Request,
     _env: unknown,
-    ctx: ExecutionContext
+    ctx: ExecutionContext,
   ): Promise<Response> {
     const url = new URL(request.url);
 
@@ -53,7 +52,10 @@ export default {
       const contentType = request.headers.get("content-type") || "";
       if (contentType.includes("application/json")) {
         try {
-          const body = (await request.json()) as { code?: string; mermaid?: string };
+          const body = (await request.json()) as {
+            code?: string;
+            mermaid?: string;
+          };
           code = body.code || body.mermaid || null;
         } catch {
           return new Response("Invalid JSON body", { status: 400 });
@@ -64,37 +66,57 @@ export default {
     }
 
     if (!code) {
-      code = url.searchParams.get("code") || url.searchParams.get("mermaid") || DEFAULT_MERMAID;
+      code =
+        url.searchParams.get("code") ||
+        url.searchParams.get("mermaid") ||
+        DEFAULT_MERMAID;
     }
 
-    const format = (url.searchParams.get("format") || "svg").toLowerCase() as OutputFormat;
+    const format = (
+      url.searchParams.get("format") || "svg"
+    ).toLowerCase() as OutputFormat;
     const themeParam = url.searchParams.get("theme") || "light";
-    const theme: MermaidTheme = themeParam in MERMAID_THEMES ? (themeParam as MermaidTheme) : "light";
-    const mode = (url.searchParams.get("mode") || "strict") as "strict" | "compat" | "recover";
-    const bg = url.searchParams.get("bg") || url.searchParams.get("background") || undefined;
+    const theme: MermaidTheme =
+      themeParam in MERMAID_THEMES ? (themeParam as MermaidTheme) : "light";
+    const mode = (url.searchParams.get("mode") || "strict") as
+      | "strict"
+      | "compat"
+      | "recover";
+    const bg =
+      url.searchParams.get("bg") ||
+      url.searchParams.get("background") ||
+      undefined;
     const paddingParam = url.searchParams.get("padding");
-    const padding = paddingParam !== null ? Math.max(0, parseInt(paddingParam, 10) || 0) : 16;
+    const padding =
+      paddingParam !== null ? Math.max(0, parseInt(paddingParam, 10) || 0) : 16;
     const directives = url.searchParams.get("directives") !== "false";
     const isDownload = url.searchParams.get("download") === "true";
 
     try {
-      const result = await renderMermaidWith(render, code, {
+      const result = await render({
+        mermaid: {
+          source: code,
+          theme,
+          mode,
+          background: bg,
+          padding,
+          directives,
+        },
         format,
-        theme,
-        mode,
-        background: bg,
-        padding,
-        directives,
       });
 
-      const contentType = CONTENT_TYPES[format] || "image/svg+xml; charset=utf-8";
+      const contentType =
+        CONTENT_TYPES[format] || "image/svg+xml; charset=utf-8";
       const headers = new Headers({
         "Content-Type": contentType,
         "Cache-Control": "public, max-age=31536000, immutable",
       });
 
       if (isDownload) {
-        headers.set("Content-Disposition", `attachment; filename="diagram.${format}"`);
+        headers.set(
+          "Content-Disposition",
+          `attachment; filename="diagram.${format}"`,
+        );
       }
 
       const response = new Response(result.data as BodyInit, {

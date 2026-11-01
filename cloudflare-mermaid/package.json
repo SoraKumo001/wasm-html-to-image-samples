@@ -10,7 +10,7 @@
     "test": "node scripts/smoke.mjs"
   },
   "dependencies": {
-    "wasm-html-to-image": "^1.0.37"
+    "wasm-html-to-image": "^1.1.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261101.1",
