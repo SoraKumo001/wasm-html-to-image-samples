@@ -18,7 +18,7 @@
     "mermaid": "^12.2.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "wasm-html-to-image": "^1.0.28"
+    "wasm-html-to-image": "^1.0.34"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

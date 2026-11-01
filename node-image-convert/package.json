@@ -9,7 +9,7 @@
   },
   "type": "module",
   "dependencies": {
-    "wasm-html-to-image": "^1.0.28"
+    "wasm-html-to-image": "^1.0.34"
   },
   "devDependencies": {
     "@types/node": "26.6.6",
