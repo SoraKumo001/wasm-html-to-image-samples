@@ -413,19 +413,19 @@ Grid,Losses,30`,
     description: "Chronological timeline of milestone web developments across decades",
     code: `timeline
     title Evolution of Modern Web Technologies
-    section 1990s : The Static Era
+    section 1990s - The Static Era
         1991 : World Wide Web launched
         1995 : JavaScript created : HTML 2.0
         1996 : CSS introduced
-    section 2000s : The Dynamic Web
+    section 2000s - The Dynamic Web
         2004 : Gmail & Ajax popularity
         2008 : Google Chrome & V8 engine
         2009 : Node.js created
-    section 2010s : Reactive & Standards
+    section 2010s - Reactive & Standards
         2013 : React launched
         2015 : ES6 (ECMAScript 2015)
         2017 : WebAssembly 1.0 standard
-    section 2020s : Edge & Wasm
+    section 2020s - Edge & Wasm
         2022 : Next.js App Router
         2024 : Wasm Component Model
         2026 : Universal Wasm Toolchains`,

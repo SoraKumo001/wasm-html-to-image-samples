@@ -7,7 +7,7 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 minimumReleaseAgeExclude:
-  - wasm-html-to-image@0.1.1 || 1.0.26 || 1.0.27 || 1.0.28 || 1.0.33 || 1.0.34 || 1.0.35 || 1.0.36
+  - wasm-html-to-image@0.1.1 || 1.0.26 || 1.0.27 || 1.0.28 || 1.0.33 || 1.0.34 || 1.0.35 || 1.0.36 || 1.0.37
   - '@cloudflare/workers-types@5.20260906.1 || 5.20261030.1 || 5.20261031.1 || 5.20261101.1'
   - miniflare@5.20261023.3-beta
   - wrangler@4.156.0
