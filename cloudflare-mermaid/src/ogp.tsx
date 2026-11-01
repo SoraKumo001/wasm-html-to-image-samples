@@ -1,4 +1,6 @@
 import type { Context } from "hono";
+import { raw } from "hono/html";
+import type { FC } from "hono/jsx";
 import { render, MERMAID_THEMES, type MermaidTheme } from "wasm-html-to-image";
 import { PRESETS } from "./presets.js";
 
@@ -22,7 +24,6 @@ export function generateFaviconSvg(): string {
 }
 
 function makeSvgResponsive(svg: string): string {
-  // Find the root <svg ...> tag
   const rootTagMatch = svg.match(/<svg\b([^>]*)>/i);
   if (!rootTagMatch) return svg;
 
@@ -39,12 +40,10 @@ function makeSvgResponsive(svg: string): string {
     }
   }
 
-  // Ensure preserveAspectRatio="xMidYMid meet" so the entire diagram scales without distortion
   if (!/\bpreserveAspectRatio\s*=/i.test(rootAttrs)) {
     rootAttrs += ' preserveAspectRatio="xMidYMid meet"';
   }
 
-  // Set width and height to 100% on the root <svg> tag so it smoothly scales inside the container
   rootAttrs = rootAttrs
     .replace(/\bwidth\s*=\s*["']?[^"'\s>]+["']?/gi, 'width="100%"')
     .replace(/\bheight\s*=\s*["']?[^"'\s>]+["']?/gi, 'height="100%"');
@@ -52,22 +51,24 @@ function makeSvgResponsive(svg: string): string {
   return svg.replace(rootTagMatch[0], `<svg ${rootAttrs}>`);
 }
 
-export function generateOgpHtml(options: {
+interface OgpCardProps {
   diagramSvg: string;
   presetName: string;
   theme: string;
   mode: string;
   bg: string;
-}): string {
-  const { diagramSvg, presetName, theme, mode, bg } = options;
-  const isDarkCanvas = bg === "#0f172a" || bg === "#1e293b" || bg === "dark";
+}
+
+export const OgpCard: FC<OgpCardProps> = ({
+  diagramSvg,
+  presetName,
+  theme,
+  mode,
+  bg,
+}) => {
   const canvasBg = bg === "transparent" ? "transparent" : bg;
 
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <style>
+  const styles = `
     * { box-sizing: border-box; }
     html, body {
       margin: 0;
@@ -93,7 +94,6 @@ export function generateOgpHtml(options: {
       overflow: hidden;
     }
 
-    /* Glow Orbs */
     .glow-cyan {
       position: absolute;
       top: -100px;
@@ -125,7 +125,6 @@ export function generateOgpHtml(options: {
       pointer-events: none;
     }
 
-    /* Grid overlay */
     .grid-overlay {
       position: absolute;
       inset: 0;
@@ -135,7 +134,6 @@ export function generateOgpHtml(options: {
       pointer-events: none;
     }
 
-    /* Outer border frame */
     .border-frame {
       position: absolute;
       inset: 20px;
@@ -144,7 +142,6 @@ export function generateOgpHtml(options: {
       pointer-events: none;
     }
 
-    /* Left column */
     .left-col {
       position: relative;
       z-index: 10;
@@ -246,7 +243,6 @@ export function generateOgpHtml(options: {
     }
     .footer-url span { color: #38bdf8; font-weight: bold; }
 
-    /* Right column: Card Window */
     .right-col {
       position: relative;
       z-index: 10;
@@ -348,7 +344,6 @@ export function generateOgpHtml(options: {
       object-fit: contain !important;
     }
 
-    /* Checkered pattern when background is transparent */
     .checkered-pattern {
       background-color: #0f172a;
       background-image: linear-gradient(45deg, #1e293b 25%, transparent 25%),
@@ -384,108 +379,114 @@ export function generateOgpHtml(options: {
       background: #10b981;
       box-shadow: 0 0 6px #10b981;
     }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="glow-cyan"></div>
-    <div class="glow-indigo"></div>
-    <div class="glow-teal"></div>
-    <div class="grid-overlay"></div>
-    <div class="border-frame"></div>
+  `;
 
-    <!-- Left Column -->
-    <div class="left-col">
-      <div class="badge">
-        <div class="badge-dot"></div>
-        CLOUDFLARE WORKERS ⚡ WASM
-      </div>
+  return (
+    <html lang="en">
+      <head>
+        <meta charset="utf-8" />
+        <style dangerouslySetInnerHTML={{ __html: styles }} />
+      </head>
+      <body>
+        <div class="container">
+          <div class="glow-cyan" />
+          <div class="glow-indigo" />
+          <div class="glow-teal" />
+          <div class="grid-overlay" />
+          <div class="border-frame" />
 
-      <h1 class="title">Mermaid Playground</h1>
-      <div class="subtitle">Zero-DOM Edge Diagram Microservice</div>
-      <p class="desc">
-        High-speed on-the-fly Mermaid conversion into SVG, WebP, PNG &amp; JPEG.<br>
-        Interactive GUI with 26+ presets, 10 themes, syntax auto-fix &amp; edge cache.
-      </p>
+          {/* Left Column */}
+          <div class="left-col">
+            <div class="badge">
+              <div class="badge-dot" />
+              CLOUDFLARE WORKERS ⚡ WASM
+            </div>
 
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">⚡</div>
-          <div>
-            <div class="feature-title">WASM Engine</div>
-            <div class="feature-sub">~10ms Cold Start</div>
+            <h1 class="title">Mermaid Playground</h1>
+            <div class="subtitle">Zero-DOM Edge Diagram Microservice</div>
+            <p class="desc">
+              High-speed on-the-fly Mermaid conversion into SVG, WebP, PNG &amp; JPEG.<br />
+              Interactive GUI with 26+ presets, 10 themes, syntax auto-fix &amp; edge cache.
+            </p>
+
+            <div class="features-grid">
+              <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div>
+                  <div class="feature-title">WASM Engine</div>
+                  <div class="feature-sub">~10ms Cold Start</div>
+                </div>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(99, 102, 241, 0.2);">🎨</div>
+                <div>
+                  <div class="feature-title">Multi-Format</div>
+                  <div class="feature-sub">SVG, WebP, PNG, JPG</div>
+                </div>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(20, 184, 166, 0.2);">📊</div>
+                <div>
+                  <div class="feature-title">26+ Presets</div>
+                  <div class="feature-sub">Flow, Seq, ER, Git...</div>
+                </div>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon" style="background: rgba(245, 158, 11, 0.2);">🛡️</div>
+                <div>
+                  <div class="feature-title">Cache API</div>
+                  <div class="feature-sub">Edge Cached Delivery</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="footer-url">
+              ENDPOINT: <span>/ui</span> | <span>GET /?format=webp</span>
+            </div>
           </div>
+
+          {/* Right Column: Card Preview with Rendered Diagram */}
+          <div class="right-col">
+            <div class="window-card">
+              <div class="window-header">
+                <div class="window-dots">
+                  <div class="dot dot-red" />
+                  <div class="dot dot-yellow" />
+                  <div class="dot dot-green" />
+                </div>
+                <div class="window-filename">{presetName}.svg</div>
+                <div class="window-badges">
+                  <span class="meta-tag">{theme}</span>
+                  <span class="meta-tag">{mode}</span>
+                </div>
+              </div>
+
+              <div class={`diagram-body ${bg === "transparent" ? "checkered-pattern" : ""}`}>
+                <div class="diagram-container">
+                  {raw(diagramSvg)}
+                </div>
+              </div>
+
+              <div class="window-footer">
+                <div class="live-badge">
+                  <div class="live-dot" />
+                  LIVE WASM RENDER
+                </div>
+                <div>200 OK (Edge)</div>
+              </div>
+            </div>
+          </div>
+
         </div>
-
-        <div class="feature-card">
-          <div class="feature-icon" style="background: rgba(99, 102, 241, 0.2);">🎨</div>
-          <div>
-            <div class="feature-title">Multi-Format</div>
-            <div class="feature-sub">SVG, WebP, PNG, JPG</div>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon" style="background: rgba(20, 184, 166, 0.2);">📊</div>
-          <div>
-            <div class="feature-title">26+ Presets</div>
-            <div class="feature-sub">Flow, Seq, ER, Git...</div>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon" style="background: rgba(245, 158, 11, 0.2);">🛡️</div>
-          <div>
-            <div class="feature-title">Cache API</div>
-            <div class="feature-sub">Edge Cached Delivery</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer-url">
-        ENDPOINT: <span>/ui</span> | <span>GET /?format=webp</span>
-      </div>
-    </div>
-
-    <!-- Right Column: Card Preview with Rendered Diagram -->
-    <div class="right-col">
-      <div class="window-card">
-        <div class="window-header">
-          <div class="window-dots">
-            <div class="dot dot-red"></div>
-            <div class="dot dot-yellow"></div>
-            <div class="dot dot-green"></div>
-          </div>
-          <div class="window-filename">${presetName}.svg</div>
-          <div class="window-badges">
-            <span class="meta-tag">${theme}</span>
-            <span class="meta-tag">${mode}</span>
-          </div>
-        </div>
-
-        <div class="diagram-body ${bg === "transparent" ? "checkered-pattern" : ""}">
-          <div class="diagram-container">
-            ${diagramSvg}
-          </div>
-        </div>
-
-        <div class="window-footer">
-          <div class="live-badge">
-            <div class="live-dot"></div>
-            LIVE WASM RENDER
-          </div>
-          <div>200 OK (Edge)</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</body>
-</html>`;
-}
+      </body>
+    </html>
+  );
+};
 
 export async function handleOgpPng(c: Context): Promise<Response> {
-  // Cache lookup based on the exact request URL (including search params)
   const cache = await caches.open("cloudflare-mermaid");
   const cacheKey = new Request(c.req.url, { method: "GET" });
   const cached = await cache.match(cacheKey);
@@ -493,7 +494,6 @@ export async function handleOgpPng(c: Context): Promise<Response> {
     return cached;
   }
 
-  // Parse parameters
   const url = new URL(c.req.url);
   const presetId = url.searchParams.get("preset");
   const matchedPreset = PRESETS.find((p) => p.id === presetId);
@@ -519,7 +519,6 @@ export async function handleOgpPng(c: Context): Promise<Response> {
     url.searchParams.get("background") ||
     "#ffffff";
 
-  // Step 1: Render the Mermaid diagram to SVG according to parameters
   let diagramSvg = "";
   try {
     const result = await render({
@@ -548,16 +547,18 @@ export async function handleOgpPng(c: Context): Promise<Response> {
     </svg>`;
   }
 
-  // Step 2: Generate the composite OGP HTML embedding the rendered diagram SVG
-  const html = generateOgpHtml({
-    diagramSvg,
-    presetName,
-    theme,
-    mode,
-    bg,
-  });
+  // Render JSX component to string
+  const ogpComponent = (
+    <OgpCard
+      diagramSvg={diagramSvg}
+      presetName={presetName}
+      theme={theme}
+      mode={mode}
+      bg={bg}
+    />
+  );
+  const html = `<!DOCTYPE html>\n${ogpComponent.toString()}`;
 
-  // Step 3: Render the composite HTML to 1200x630 PNG
   const result = await render({
     value: html,
     format: "png",

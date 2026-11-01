@@ -7,7 +7,7 @@ import {
   type OutputFormat,
 } from "wasm-html-to-image";
 import { PRESETS } from "./presets.js";
-import { renderPlaygroundHtml } from "./playground.js";
+import { Playground } from "./playground.js";
 import { generateFaviconSvg, handleOgpPng } from "./ogp.js";
 
 const app = new Hono();
@@ -150,10 +150,10 @@ app.get("/favicon.svg", (c) =>
 
 app.get("/og.png", (c) => handleOgpPng(c));
 
-// --- Playground endpoint (UI) ---
+// --- Playground endpoint (UI) with Hono JSX ---
 app.get("/ui", (c) => {
   const url = new URL(c.req.url);
-  return c.html(renderPlaygroundHtml(url.origin, url.search));
+  return c.html(<Playground origin={url.origin} search={url.search} />);
 });
 
 // --- API: Presets list ---

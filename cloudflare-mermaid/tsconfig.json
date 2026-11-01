@@ -9,6 +9,8 @@
     "types": ["@cloudflare/workers-types"],
     "isolatedModules": true,
     "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
     "noEmit": true
   },
   "include": ["src"]
