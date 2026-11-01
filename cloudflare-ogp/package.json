@@ -13,7 +13,7 @@
     "@unocss/preset-wind4": "^66.12.0",
     "preact": "^11.1.1",
     "preact-render-to-string": "^6.8.2",
-    "wasm-html-to-image": "^1.0.34"
+    "wasm-html-to-image": "^1.0.36"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261101.1",

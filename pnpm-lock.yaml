@@ -11,8 +11,8 @@ importers:
   cloudflare-image-optimization:
     dependencies:
       wasm-html-to-image:
-        specifier: ^1.0.34
-        version: 1.0.34(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^1.0.36
+        version: 1.0.36(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^5.20261101.1
@@ -81,8 +81,8 @@ importers:
         specifier: ^6.8.2
         version: 6.8.2(preact@11.1.1)
       wasm-html-to-image:
-        specifier: ^1.0.34
-        version: 1.0.34(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@11.1.1)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^1.0.36
+        version: 1.0.36(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@11.1.1)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^5.20261101.1
@@ -109,8 +109,8 @@ importers:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
       wasm-html-to-image:
-        specifier: ^1.0.34
-        version: 1.0.34(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^1.0.36
+        version: 1.0.36(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.3.3
@@ -146,8 +146,8 @@ importers:
         specifier: 16.4.3
         version: 16.4.3(@babel/core@7.29.7(supports-color@10.2.2))(@types/node@26.6.6)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       wasm-html-to-image:
-        specifier: ^1.0.34
-        version: 1.0.34(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^1.0.36
+        version: 1.0.36(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
       '@tailwindcss/postcss':
         specifier: 4.3.3
@@ -174,8 +174,8 @@ importers:
   node-image-convert:
     dependencies:
       wasm-html-to-image:
-        specifier: ^1.0.34
-        version: 1.0.34(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^1.0.36
+        version: 1.0.36(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
       '@types/node':
         specifier: 26.6.6
@@ -196,8 +196,8 @@ importers:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
       wasm-html-to-image:
-        specifier: ^1.0.34
-        version: 1.0.34(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^1.0.36
+        version: 1.0.36(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
       '@tailwindcss/vite':
         specifier: ^4.3.3
@@ -242,8 +242,8 @@ importers:
         specifier: ^8.5.1
         version: 8.5.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       wasm-html-to-image:
-        specifier: ^1.0.34
-        version: 1.0.34(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^1.0.36
+        version: 1.0.36(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.66.0
@@ -4907,8 +4907,8 @@ packages:
     resolution: {integrity: sha512-4Nsy8K5Tr6SPDH9jhKJOHf7ChDrc1zufZTVSF7x72hwuEXBqxqk9G6cK+K2NRUtB3iELRJqjXb4JPDMBjMTl2Q==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
 
-  wasm-html-to-image@1.0.34:
-    resolution: {integrity: sha512-xYiQ/0pc4I1pkvTuTfoko/EbuPfaSlLgcwBuaN4tIIhNn8yzd7XWKHBct4/+v5eTajymEfgciSKY5QvUw+Dyvg==}
+  wasm-html-to-image@1.0.36:
+    resolution: {integrity: sha512-AWec/yEFrM5VwTojhODL8fpJ7j8e1lZOm6S/YSc8cbYPvAsM3JvgupNdHNiaO6sDgRgBYemvbxifwAJB2cnmWg==}
     engines: {node: '>=20.0.0'}
     hasBin: true
     peerDependencies:
@@ -9998,7 +9998,7 @@ snapshots:
       xml-name-validator: 5.0.0
     optional: true
 
-  wasm-html-to-image@1.0.34(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+  wasm-html-to-image@1.0.36(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@10.29.8)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       commander: 15.0.0
       worker-lib: 2.2.1
@@ -10017,7 +10017,7 @@ snapshots:
       - '@noble/hashes'
       - canvas
 
-  wasm-html-to-image@1.0.34(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@11.1.1)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+  wasm-html-to-image@1.0.36(@unocss/core@66.12.0)(@unocss/preset-wind4@66.12.0)(preact-render-to-string@6.8.2)(preact@11.1.1)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       commander: 15.0.0
       worker-lib: 2.2.1

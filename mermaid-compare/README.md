@@ -13,7 +13,9 @@ Interactive comparison app comparing [`wasm-html-to-image`](https://www.npmjs.co
 - **Side-by-Side & Split Slider Views**:
   - Compare diagram layout, node spacing, font rendering, and arrow routing side-by-side or using a real-time draggable overlay slider.
 - **Support for Key Diagram Types**:
-  - Pre-configured presets for Flowcharts, Sequence Diagrams, Class Diagrams, State Diagrams, ER Diagrams, Charts (Pie, XY Chart), and Multilingual diagrams.
+  - Pre-configured presets for Flowcharts, Sequence, Class, State, ER, Pie, XY Chart, Sankey, Quadrant, Gantt, Git Graph, User Journey, Mindmap, Timeline, Requirement, C4 Architecture, Kanban, Block, and Multilingual diagrams.
+- **Individual Zoom & Auto-Match Scaling**:
+  - Set zoom factors (25% - 400%) independently for each rendering engine, or use the 1-click "Match Size" button to align diagram dimensions automatically.
 - **Multilingual & CJK Full Support**:
   - Out-of-the-box support for Japanese (日本語), Chinese (中文), Korean (한국어), European accents, and emoji with accurate text measurement and line wrapping.
 - **Theme Testing**:
@@ -70,6 +72,7 @@ The settings are kept in the address bar, so a link reproduces the screen. Value
 | `theme` | a theme name (`light`, `dark`, `forest`, ...) | `light` |
 | `view` | `side-by-side`, `slider`, `wasm-only`, `official-only` | `side-by-side` |
 | `scale` | `fit`, `original` | `fit` |
+| `wzoom`, `ozoom` | zoom percentage (`25` to `400`) for WASM / Official | `100` |
 | `bg`, `bgColor` | `light`, `dark`, `gray`, `checker`, `custom`; `#rrggbb` for `custom` | `light` |
 | `mode` | `strict`, `compat`, `recover` | the preset's recommended mode |
 | `format` | `svg`, `png`, `webp` | `svg` |

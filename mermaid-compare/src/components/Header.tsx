@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { PRESETS, type PresetItem } from "../presets/index.ts";
 import { MERMAID_THEMES, type MermaidTheme } from "../utils/renderWasm.ts";
 
@@ -25,6 +25,16 @@ export const Header: React.FC<HeaderProps> = ({
   onRender,
   isRendering,
 }) => {
+  const categories = useMemo(() => {
+    const map = new Map<string, PresetItem[]>();
+    for (const p of PRESETS) {
+      const list = map.get(p.category) ?? [];
+      list.push(p);
+      map.set(p.category, list);
+    }
+    return Array.from(map.entries());
+  }, []);
+
   return (
     <header className="bg-slate-800 border-b border-slate-700 px-3 py-2 flex items-center justify-between gap-2 sticky top-0 z-20 shadow-md min-w-0">
       {/* Left: Brand & Preset Selector */}
@@ -46,12 +56,16 @@ export const Header: React.FC<HeaderProps> = ({
               const p = PRESETS.find((x) => x.id === e.target.value);
               if (p) onSelectPreset(p);
             }}
-            className="text-xs bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer max-w-[160px] sm:max-w-[220px] md:max-w-[280px] truncate"
+            className="text-xs bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer max-w-[170px] sm:max-w-[240px] md:max-w-[320px] truncate"
           >
-            {PRESETS.map((p) => (
-              <option key={p.id} value={p.id}>
-                [{p.category}] {p.name}
-              </option>
+            {categories.map(([category, items]) => (
+              <optgroup key={category} label={category} className="bg-slate-800 text-slate-300 font-semibold">
+                {items.map((p) => (
+                  <option key={p.id} value={p.id} className="bg-slate-900 text-slate-200 font-normal">
+                    {p.name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>

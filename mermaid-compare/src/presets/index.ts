@@ -1,16 +1,35 @@
+export type PresetCategory =
+  | "Flowchart"
+  | "Sequence"
+  | "Class"
+  | "State"
+  | "ER"
+  | "Chart"
+  | "Gantt"
+  | "Git"
+  | "Journey"
+  | "Mindmap"
+  | "Timeline"
+  | "Requirement"
+  | "Architecture"
+  | "Kanban"
+  | "Recovery"
+  | "Multilingual";
+
 export interface PresetItem {
   id: string;
   name: string;
-  category: "Flowchart" | "Sequence" | "Class" | "State" | "ER" | "Chart" | "Recovery" | "Multilingual";
+  category: PresetCategory;
   code: string;
   description: string;
   recommendedMode?: "strict" | "compat" | "recover";
 }
 
 export const PRESETS: PresetItem[] = [
+  // --- Flowchart ---
   {
     id: "flowchart-simple",
-    name: "Flowchart - Simple",
+    name: "Flowchart - Simple Decision",
     category: "Flowchart",
     description: "Basic left-to-right flowchart with decision node and labels",
     code: `graph LR
@@ -43,6 +62,20 @@ export const PRESETS: PresetItem[] = [
     Auth --> Order`,
   },
   {
+    id: "flowchart-branching",
+    name: "Flowchart - Branching Logic",
+    category: "Flowchart",
+    description: "Flowchart with diamond decision nodes and condition branches",
+    code: `graph LR
+    A[Start Node] --> B{Check Condition}
+    B -- Pass --> C[Approved]
+    B -- Fail --> D[Rejected]
+    C --> E[End]
+    D --> E`,
+  },
+
+  // --- Sequence ---
+  {
     id: "sequence-auth",
     name: "Sequence - Authentication Flow",
     category: "Sequence",
@@ -66,6 +99,43 @@ export const PRESETS: PresetItem[] = [
     Note over Client,Auth: Token expires in 1 hour
     Client-->>User: Show Dashboard`,
   },
+  {
+    id: "sequence-advanced",
+    name: "Sequence - Alt & Par Branches",
+    category: "Sequence",
+    description: "Advanced sequence diagram with alternative paths, parallel processing, and database interactions",
+    code: `sequenceDiagram
+    autonumber
+    actor Client
+    participant Gateway as API Gateway
+    participant Cache as Redis Cache
+    participant Service as Order Service
+    participant DB as Postgres DB
+
+    Client->>Gateway: POST /orders
+    activate Gateway
+    Gateway->>Cache: Check Idempotency Key
+    alt Key exists (Duplicate Request)
+        Cache-->>Gateway: Cached Order Summary
+        Gateway-->>Client: 200 OK (From Cache)
+    else New Request
+        Gateway->>Service: Create Order
+        activate Service
+        par Parallel Verification
+            Service->>DB: Check Inventory Balance
+            Service->>Service: Validate Credit Limit
+        end
+        Service->>DB: INSERT into orders
+        DB-->>Service: Order #10492 Created
+        Service->>Cache: Save Idempotency Key (TTL 24h)
+        Service-->>Gateway: Order Details
+        deactivate Service
+        Gateway-->>Client: 201 Created
+    end
+    deactivate Gateway`,
+  },
+
+  // --- Class ---
   {
     id: "class-diagram",
     name: "Class - Domain Model",
@@ -101,6 +171,8 @@ export const PRESETS: PresetItem[] = [
     User <|-- Admin
     Customer "1" *-- "*" Order : places`,
   },
+
+  // --- State ---
   {
     id: "state-order",
     name: "State - Order Lifecycle",
@@ -122,6 +194,8 @@ export const PRESETS: PresetItem[] = [
     Delivered --> [*]
     Cancelled --> [*]`,
   },
+
+  // --- ER ---
   {
     id: "er-ecommerce",
     name: "ER - Database Schema",
@@ -159,6 +233,8 @@ export const PRESETS: PresetItem[] = [
         float price
     }`,
   },
+
+  // --- Chart & Analytics (Pie, XY, Sankey, Quadrant) ---
   {
     id: "pie-usage",
     name: "Pie - Browser Share",
@@ -184,17 +260,285 @@ export const PRESETS: PresetItem[] = [
     line [50, 65, 80, 90]`,
   },
   {
-    id: "flowchart-branching",
-    name: "Flowchart - Branching Logic",
-    category: "Flowchart",
-    description: "Flowchart with diamond decision nodes and condition branches",
-    code: `graph LR
-    A[Start Node] --> B{Check Condition}
-    B -- Pass --> C[Approved]
-    B -- Fail --> D[Rejected]
-    C --> E[End]
-    D --> E`,
+    id: "sankey-energy",
+    name: "Sankey - Energy Distribution",
+    category: "Chart",
+    description: "Sankey diagram visualizing energy generation and sector distribution flows",
+    code: `sankey-beta
+
+Solar,Grid,120
+Wind,Grid,180
+Hydro,Grid,90
+Nuclear,Grid,210
+Gas,Grid,70
+Grid,Residential,250
+Grid,Commercial,190
+Grid,Industrial,200
+Grid,Losses,30`,
   },
+  {
+    id: "quadrant-priority",
+    name: "Quadrant - Feature Prioritization",
+    category: "Chart",
+    description: "Quadrant chart mapping engineering tasks by complexity and value",
+    code: `quadrantChart
+    title Engineering Prioritization Matrix
+    x-axis Low Complexity --> High Complexity
+    y-axis Low Value --> High Value
+    quadrant-1 Quick Wins
+    quadrant-2 Strategic Investments
+    quadrant-3 Low Hanging Fruit
+    quadrant-4 Time Sinks
+    "Dark Mode": [0.22, 0.72]
+    "Wasm Acceleration": [0.78, 0.88]
+    "Export to WebP": [0.35, 0.65]
+    "Refactor Legacy CSS": [0.65, 0.28]
+    "Custom Font Picker": [0.42, 0.45]
+    "Distributed Cache": [0.82, 0.42]`,
+  },
+
+  // --- Gantt ---
+  {
+    id: "gantt-roadmap",
+    name: "Gantt - Engineering Roadmap",
+    category: "Gantt",
+    description: "Gantt schedule showing milestones, critical paths, and project phases",
+    code: `gantt
+    title Product Engineering Roadmap
+    dateFormat YYYY-MM-DD
+    excludes weekends
+
+    section Research & Spec
+        Market analysis          :done,    spec1, 2026-01-05, 2026-01-19
+        Architecture RFC         :done,    spec2, 2026-01-20, 2026-02-06
+
+    section Core Engine
+        Parser & AST rewrite     :active,  core1, 2026-02-09, 2026-03-06
+        WASM binary optimization :crit,    core2, 2026-02-23, 2026-03-20
+
+    section UI & Integration
+        Side-by-side comparison  :active,  ui1,   2026-03-02, 2026-03-27
+        Slider overlay tool      :         ui2,   2026-03-16, 2026-04-03
+
+    section Launch
+        Beta release             :milestone, m1, 2026-03-31, 0d
+        Public launch            :milestone, m2, 2026-04-15, 0d`,
+  },
+
+  // --- Git Graph ---
+  {
+    id: "git-branches",
+    name: "Git - Feature Branches & Releases",
+    category: "Git",
+    description: "Git commit history with branch workflows, merges, and version tags",
+    code: `gitGraph
+    commit id: "Initial commit"
+    commit id: "Setup Vite & Tailwind"
+    branch feature/zoom-control
+    checkout feature/zoom-control
+    commit id: "Add ZoomControl UI"
+    commit id: "Support Shift-click 1%"
+    checkout main
+    merge feature/zoom-control tag: "v1.1.0"
+    branch feature/slider
+    checkout feature/slider
+    commit id: "Implement split slider"
+    commit id: "Fix touch dragging"
+    checkout main
+    merge feature/slider tag: "v1.2.0"
+    commit id: "Update README"`,
+  },
+
+  // --- User Journey ---
+  {
+    id: "journey-shopping",
+    name: "Journey - Customer Experience",
+    category: "Journey",
+    description: "User journey map tracking satisfaction scores across shopping phases",
+    code: `journey
+    title Customer Checkout Journey
+    section Discovery
+      Browse catalog: 5: Customer
+      Filter by category: 4: Customer
+      Read reviews: 3: Customer
+    section Cart & Checkout
+      Add item to cart: 5: Customer
+      Review order details: 4: Customer
+      Apply discount code: 2: Customer, Support
+      Enter shipping info: 3: Customer
+    section Payment & Fulfillment
+      Authorize payment: 5: Customer, Bank
+      Order confirmation: 5: Customer, Store
+      Courier tracking: 4: Customer, Courier`,
+  },
+
+  // --- Mindmap ---
+  {
+    id: "mindmap-cloud",
+    name: "Mindmap - Cloud Platform Topology",
+    category: "Mindmap",
+    description: "Hierarchical mindmap detailing cloud infrastructure domains",
+    code: `mindmap
+  root((Cloud Platform))
+    Compute
+      Containers
+        Kubernetes
+        Cloud Run
+      Serverless
+        Workers
+        Edge Functions
+      Virtual Machines
+    Data & Storage
+      Relational
+        Postgres
+        MySQL
+      Key-Value
+        Redis
+      Object Storage
+    Networking
+      API Gateway
+      Cloud CDN
+      DNS & Anycast
+    Observability
+      Metrics
+      Distributed Tracing
+      Error Logging`,
+  },
+
+  // --- Timeline ---
+  {
+    id: "timeline-web",
+    name: "Timeline - Web Tech Evolution",
+    category: "Timeline",
+    description: "Chronological timeline of milestone web developments across decades",
+    code: `timeline
+    title Evolution of Modern Web Technologies
+    section 1990s : The Static Era
+        1991 : World Wide Web launched
+        1995 : JavaScript created : HTML 2.0
+        1996 : CSS introduced
+    section 2000s : The Dynamic Web
+        2004 : Gmail & Ajax popularity
+        2008 : Google Chrome & V8 engine
+        2009 : Node.js created
+    section 2010s : Reactive & Standards
+        2013 : React launched
+        2015 : ES6 (ECMAScript 2015)
+        2017 : WebAssembly 1.0 standard
+    section 2020s : Edge & Wasm
+        2022 : Next.js App Router
+        2024 : Wasm Component Model
+        2026 : Universal Wasm Toolchains`,
+  },
+
+  // --- Requirement ---
+  {
+    id: "requirement-auth",
+    name: "Requirement - Security & MFA",
+    category: "Requirement",
+    description: "SysML requirement diagram linking functional specifications to architectural elements",
+    code: `requirementDiagram
+
+    requirement secure_storage {
+      id: "REQ-001"
+      text: The database shall store authentication secrets using Argon2id hashing.
+      risk: High
+      verifymethod: Test
+    }
+
+    functionalRequirement rate_limiting {
+      id: "REQ-002"
+      text: Login endpoint shall throttle repeated attempts to 5 requests per minute.
+      risk: Medium
+      verifymethod: Test
+    }
+
+    element auth_gateway {
+      type: Component
+      docref: "/docs/auth"
+    }
+
+    secure_storage - contains -> rate_limiting
+    auth_gateway - satisfies -> rate_limiting`,
+  },
+
+  // --- Architecture (C4 & Block) ---
+  {
+    id: "c4-context",
+    name: "C4 - Internet Banking Context",
+    category: "Architecture",
+    description: "C4 context diagram defining system boundary, users, and external system integrations",
+    code: `C4Context
+    title System Context Diagram - E-Commerce Platform
+
+    Person(customer, "Customer", "A customer shopping for products online")
+    Person(admin, "Store Manager", "Manages catalog, pricing, and orders")
+
+    System(store_system, "Online Store Platform", "Allows customers to search products, make payments, and track orders")
+
+    System_Ext(payment_gateway, "Payment Gateway", "Processes credit cards and electronic wallets")
+    System_Ext(email_service, "Notification Service", "Sends transactional emails and SMS")
+    System_Ext(warehouse_api, "Logistics ERP", "Manages automated warehouse inventory and dispatch")
+
+    Rel(customer, store_system, "Browses products and places orders", "HTTPS")
+    Rel(admin, store_system, "Manages inventory & order statuses", "HTTPS")
+    Rel(store_system, payment_gateway, "Authorizes charges", "REST / JSON")
+    Rel(store_system, email_service, "Triggers order alerts", "SMTP / API")
+    Rel(store_system, warehouse_api, "Transmits packing orders", "gRPC")`,
+  },
+  {
+    id: "block-architecture",
+    name: "Block - Three-Tier Infrastructure",
+    category: "Architecture",
+    description: "Block-beta diagram displaying layered cloud components and data pathways",
+    code: `block-beta
+  columns 3
+  DNS["Edge DNS / Anycast"]:3
+  space:1 CDN["Global CDN"]:1 space:1
+  
+  block:LB:3
+    columns 2
+    PublicGW["Public API Gateway"]
+    PrivateGW["Internal Service Mesh"]
+  end
+
+  block:Services:3
+    columns 3
+    Auth["Auth Service"]
+    Order["Order Service"]
+    Billing["Billing Service"]
+  end
+
+  Storage[("Distributed Database Cluster")]:3
+
+  DNS --> CDN
+  CDN --> LB
+  LB --> Services
+  Services --> Storage`,
+  },
+
+  // --- Kanban ---
+  {
+    id: "kanban-sprint",
+    name: "Kanban - Sprint Board",
+    category: "Kanban",
+    description: "Kanban board mapping workflow columns, assignees, and priorities",
+    code: `kanban
+  Backlog
+    [User Profile Page]
+    [Export to PDF Report]@{ priority: 'Low' }
+  To Do
+    [Support custom fonts]@{ priority: 'High' }
+    [Auto-save diagram drafts]
+  In Progress
+    [Individual Zoom Control]@{ assigned: 'DevA', priority: 'Urgent' }
+    [Preset catalog expansion]@{ assigned: 'DevB' }
+  Done
+    [Split overlay slider]
+    [SVG dimension parser]`,
+  },
+
+  // --- Multilingual & Internationalization ---
   {
     id: "multilingual-services",
     name: "Multilingual - Global Services (日・中・韓・英)",
@@ -249,7 +593,7 @@ export const PRESETS: PresetItem[] = [
     deactivate 在庫
     決済-->>ユーザー: 決済完了 (Payment Successful 🎉)
     deactivate 決済
-    決済-)通知: メール送信 (주문 확인 메イル 전송)
+    決済-)通知: メール送信 (주문 확인 메일 전送)
     Note over ユーザー,決済: 日・英・韓・仏の多言語テキストと絵文字`,
   },
   {
