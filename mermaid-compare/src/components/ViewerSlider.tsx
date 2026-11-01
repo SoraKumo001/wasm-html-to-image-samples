@@ -2,11 +2,16 @@ import React, { useState, useRef, useCallback, useEffect, useMemo } from "react"
 import type { WasmRenderResult } from "../utils/renderWasm.ts";
 import type { OfficialRenderResult } from "../utils/renderOfficial.ts";
 import { type ScaleMode, type CanvasBgSettings, getCanvasBgStyle } from "./CanvasToolbar.tsx";
+import { ZoomControl } from "./ZoomControl.tsx";
 
 interface ViewerSliderProps {
   wasmResult: WasmRenderResult | null;
   officialResult: OfficialRenderResult | null;
   scaleMode: ScaleMode;
+  wasmZoom: number;
+  onChangeWasmZoom: (zoom: number) => void;
+  officialZoom: number;
+  onChangeOfficialZoom: (zoom: number) => void;
   bgSettings: CanvasBgSettings;
 }
 
@@ -14,6 +19,10 @@ export const ViewerSlider: React.FC<ViewerSliderProps> = ({
   wasmResult,
   officialResult,
   scaleMode,
+  wasmZoom,
+  onChangeWasmZoom,
+  officialZoom,
+  onChangeOfficialZoom,
   bgSettings,
 }) => {
   const [sliderPos, setSliderPos] = useState<number>(50); // percentage 0 - 100
@@ -83,13 +92,31 @@ export const ViewerSlider: React.FC<ViewerSliderProps> = ({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-      <div className="flex items-center justify-between px-3 py-1.5 bg-slate-800/80 border-b border-slate-700 text-xs shrink-0">
-        <span className="font-semibold text-slate-300">
-          Split Overlay Slider
-        </span>
-        <div className="flex items-center gap-3 text-[11px]">
-          <span className="text-teal-400">◄ Left: wasm ({sliderPos}%)</span>
-          <span className="text-indigo-400">Right: Official ({100 - sliderPos}%) ►</span>
+      {/* Top Header with Sliders and Zoom Controls */}
+      <div className="flex flex-wrap items-center justify-between px-3 py-1.5 bg-slate-800/80 border-b border-slate-700 text-xs shrink-0 gap-2">
+        <div className="flex items-center gap-3">
+          <span className="font-semibold text-slate-300">
+            Split Overlay Slider
+          </span>
+          <div className="flex items-center gap-2 text-[11px]">
+            <span className="text-teal-400 font-medium">◄ Left ({sliderPos}%)</span>
+            <span className="text-indigo-400 font-medium">Right ({100 - sliderPos}%) ►</span>
+          </div>
+        </div>
+
+        {/* Dual Zoom Controls */}
+        <div className="flex items-center gap-3">
+          <ZoomControl
+            label="WASM"
+            zoom={wasmZoom}
+            onChangeZoom={onChangeWasmZoom}
+          />
+          <span className="text-slate-600">|</span>
+          <ZoomControl
+            label="Official"
+            zoom={officialZoom}
+            onChangeZoom={onChangeOfficialZoom}
+          />
         </div>
       </div>
 
@@ -102,7 +129,11 @@ export const ViewerSlider: React.FC<ViewerSliderProps> = ({
         {/* Layer 1 (Official Mermaid - Underneath / Right-dominant) */}
         <div className={`${layerClasses} pointer-events-none`}>
           <div
-            className="opacity-95"
+            className="opacity-95 transition-transform"
+            style={{
+              transform: `scale(${officialZoom / 100})`,
+              transformOrigin: "center center",
+            }}
             dangerouslySetInnerHTML={{ __html: officialResult.svg }}
           />
         </div>
@@ -114,19 +145,27 @@ export const ViewerSlider: React.FC<ViewerSliderProps> = ({
             clipPath: `polygon(0 0, ${sliderPos}% 0, ${sliderPos}% 100%, 0 100%)`,
           }}
         >
-          {typeof wasmResult.data === "string" ? (
-            <div dangerouslySetInnerHTML={{ __html: wasmResult.data }} />
-          ) : wasmImageUrl ? (
-            <img
-              src={wasmImageUrl}
-              alt="WASM Rendered"
-              className={
-                scaleMode === "fit"
-                  ? "max-w-full max-h-full object-contain"
-                  : "max-w-none"
-              }
-            />
-          ) : null}
+          <div
+            className="transition-transform"
+            style={{
+              transform: `scale(${wasmZoom / 100})`,
+              transformOrigin: "center center",
+            }}
+          >
+            {typeof wasmResult.data === "string" ? (
+              <div dangerouslySetInnerHTML={{ __html: wasmResult.data }} />
+            ) : wasmImageUrl ? (
+              <img
+                src={wasmImageUrl}
+                alt="WASM Rendered"
+                className={
+                  scaleMode === "fit"
+                    ? "max-w-full max-h-full object-contain"
+                    : "max-w-none"
+                }
+              />
+            ) : null}
+          </div>
         </div>
 
         {/* Draggable Divider Line */}

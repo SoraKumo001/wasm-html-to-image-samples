@@ -10,6 +10,8 @@ export interface AppSettings {
   theme: MermaidTheme;
   view: ViewMode;
   scale: ScaleMode;
+  wasmZoom: number;
+  officialZoom: number;
   bg: CanvasBgSettings;
   options: WasmRenderOptions;
 }
@@ -26,6 +28,15 @@ const DEFAULT_PADDING = 16;
 const pick = <T extends string>(value: string | null, allowed: readonly T[], fallback: T): T =>
   allowed.includes(value as T) ? (value as T) : fallback;
 
+const parseZoom = (value: string | null, fallback: number = 100): number => {
+  if (value === null) return fallback;
+  const num = Number(value);
+  if (Number.isFinite(num) && num >= 25 && num <= 400) {
+    return Math.round(num);
+  }
+  return fallback;
+};
+
 export function defaultSettings(preset: PresetItem = PRESETS[0]): AppSettings {
   return {
     preset,
@@ -33,6 +44,8 @@ export function defaultSettings(preset: PresetItem = PRESETS[0]): AppSettings {
     theme: "light",
     view: "side-by-side",
     scale: "fit",
+    wasmZoom: 100,
+    officialZoom: 100,
     bg: { type: "light", customColor: DEFAULT_CUSTOM_BG },
     options: {
       theme: "light",
@@ -57,6 +70,8 @@ export function settingsFromParams(params: URLSearchParams): AppSettings {
     theme,
     view: pick(params.get("view"), VIEWS, base.view),
     scale: pick(params.get("scale"), SCALES, base.scale),
+    wasmZoom: parseZoom(params.get("wzoom"), base.wasmZoom),
+    officialZoom: parseZoom(params.get("ozoom"), base.officialZoom),
     bg: {
       type: pick(params.get("bg"), BG_TYPES, base.bg.type),
       customColor: color && /^#[0-9a-f]{6}$/i.test(color) ? color : base.bg.customColor,
@@ -80,6 +95,8 @@ export function settingsToParams(s: AppSettings): URLSearchParams {
   if (s.theme !== base.theme) params.set("theme", s.theme);
   if (s.view !== base.view) params.set("view", s.view);
   if (s.scale !== base.scale) params.set("scale", s.scale);
+  if (s.wasmZoom !== base.wasmZoom) params.set("wzoom", String(s.wasmZoom));
+  if (s.officialZoom !== base.officialZoom) params.set("ozoom", String(s.officialZoom));
   if (s.bg.type !== base.bg.type) params.set("bg", s.bg.type);
   if (s.bg.type === "custom" && s.bg.customColor !== base.bg.customColor) params.set("bgColor", s.bg.customColor);
   if (s.options.mode !== base.options.mode) params.set("mode", s.options.mode ?? "strict");

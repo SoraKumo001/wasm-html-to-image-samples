@@ -14,6 +14,11 @@ interface CanvasToolbarProps {
   onChangeScaleMode: (mode: ScaleMode) => void;
   bgSettings: CanvasBgSettings;
   onChangeBgSettings: (settings: CanvasBgSettings) => void;
+  hasCustomZoom?: boolean;
+  onResetZoom?: () => void;
+  canMatchSize?: boolean;
+  onMatchSize?: () => void;
+  matchRatioInfo?: string;
 }
 
 export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
@@ -21,6 +26,11 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   onChangeScaleMode,
   bgSettings,
   onChangeBgSettings,
+  hasCustomZoom,
+  onResetZoom,
+  canMatchSize,
+  onMatchSize,
+  matchRatioInfo,
 }) => {
   return (
     <div className="bg-slate-800/80 border-b border-slate-700/60 px-3 py-1.5 flex items-center justify-between gap-2 text-[11px] text-slate-300 shrink-0 min-w-0">
@@ -101,30 +111,54 @@ export const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
         </div>
       </div>
 
-      {/* View Scale Mode */}
-      <div className="flex items-center gap-1 bg-slate-900 border border-slate-700 rounded p-0.5 shrink-0">
-        <button
-          type="button"
-          onClick={() => onChangeScaleMode("fit")}
-          className={`px-2 py-0.5 rounded cursor-pointer transition-colors ${
-            scaleMode === "fit"
-              ? "bg-indigo-600 text-white font-medium"
-              : "text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          Fit
-        </button>
-        <button
-          type="button"
-          onClick={() => onChangeScaleMode("original")}
-          className={`px-2 py-0.5 rounded cursor-pointer transition-colors ${
-            scaleMode === "original"
-              ? "bg-indigo-600 text-white font-medium"
-              : "text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          100%
-        </button>
+      {/* Right Controls: Size Matching & Reset & View Scale Mode */}
+      <div className="flex items-center gap-2 shrink-0">
+        {onMatchSize && canMatchSize && (
+          <button
+            type="button"
+            title={matchRatioInfo || "Auto-match WASM size to Official Mermaid"}
+            onClick={onMatchSize}
+            className="px-2 py-0.5 rounded text-[10px] bg-slate-900 border border-teal-500/50 text-teal-300 hover:bg-teal-950/50 hover:border-teal-400 cursor-pointer transition-colors"
+          >
+            Match Size
+          </button>
+        )}
+        {hasCustomZoom && onResetZoom && (
+          <button
+            type="button"
+            title="Reset both zoom levels to 100%"
+            onClick={onResetZoom}
+            className="px-2 py-0.5 rounded text-[10px] bg-slate-900 border border-slate-700 text-slate-400 hover:text-slate-200 cursor-pointer transition-colors"
+          >
+            Reset Zoom
+          </button>
+        )}
+
+        {/* View Scale Mode */}
+        <div className="flex items-center gap-1 bg-slate-900 border border-slate-700 rounded p-0.5">
+          <button
+            type="button"
+            onClick={() => onChangeScaleMode("fit")}
+            className={`px-2 py-0.5 rounded cursor-pointer transition-colors ${
+              scaleMode === "fit"
+                ? "bg-indigo-600 text-white font-medium"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Fit
+          </button>
+          <button
+            type="button"
+            onClick={() => onChangeScaleMode("original")}
+            className={`px-2 py-0.5 rounded cursor-pointer transition-colors ${
+              scaleMode === "original"
+                ? "bg-indigo-600 text-white font-medium"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            100%
+          </button>
+        </div>
       </div>
     </div>
   );

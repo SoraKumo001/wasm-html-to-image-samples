@@ -53,3 +53,41 @@ export function normalizeSvg(svg: string): string {
     return `<svg ${newAttrs}>`;
   });
 }
+
+export interface SvgDimensions {
+  width: number;
+  height: number;
+}
+
+/**
+ * Extracts width and height in user units from an SVG string (preferring viewBox).
+ */
+export function getSvgDimensions(svg: string): SvgDimensions | null {
+  if (!svg || typeof svg !== "string") return null;
+  const svgMatch = svg.match(/<svg\b([^>]*?)>/i);
+  if (!svgMatch) return null;
+  const attrs = svgMatch[1];
+
+  // Try viewBox first: viewBox="x y w h"
+  const vbMatch = attrs.match(/\bviewBox=["']\s*([-\d.]+)\s+([-\d.]+)\s+([\d.]+)\s+([\d.]+)\s*["']/i);
+  if (vbMatch) {
+    const w = parseFloat(vbMatch[3]);
+    const h = parseFloat(vbMatch[4]);
+    if (!isNaN(w) && !isNaN(h) && w > 0 && h > 0) {
+      return { width: Math.round(w * 10) / 10, height: Math.round(h * 10) / 10 };
+    }
+  }
+
+  // Fallback to width / height attributes
+  const wMatch = attrs.match(/\bwidth=["']([\d.]+)(?:px)?["']/i);
+  const hMatch = attrs.match(/\bheight=["']([\d.]+)(?:px)?["']/i);
+  if (wMatch && hMatch) {
+    const w = parseFloat(wMatch[1]);
+    const h = parseFloat(hMatch[1]);
+    if (!isNaN(w) && !isNaN(h) && w > 0 && h > 0) {
+      return { width: Math.round(w * 10) / 10, height: Math.round(h * 10) / 10 };
+    }
+  }
+
+  return null;
+}

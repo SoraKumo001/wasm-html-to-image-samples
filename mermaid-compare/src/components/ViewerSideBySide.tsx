@@ -2,13 +2,52 @@ import React, { useMemo } from "react";
 import type { WasmRenderResult } from "../utils/renderWasm.ts";
 import type { OfficialRenderResult } from "../utils/renderOfficial.ts";
 import { type ScaleMode, type CanvasBgSettings, getCanvasBgStyle } from "./CanvasToolbar.tsx";
+import { ZoomControl } from "./ZoomControl.tsx";
+import { getSvgDimensions, type SvgDimensions } from "../utils/svgUtils.ts";
 
 interface ViewerSideBySideProps {
   wasmResult: WasmRenderResult | null;
   officialResult: OfficialRenderResult | null;
   mode: "side-by-side" | "wasm-only" | "official-only";
   scaleMode: ScaleMode;
+  wasmZoom: number;
+  onChangeWasmZoom: (zoom: number) => void;
+  officialZoom: number;
+  onChangeOfficialZoom: (zoom: number) => void;
   bgSettings: CanvasBgSettings;
+}
+
+function getDiagramContainerStyle(
+  scaleMode: ScaleMode,
+  zoom: number,
+  dims: SvgDimensions | null
+): React.CSSProperties {
+  const factor = zoom / 100;
+  if (scaleMode === "fit") {
+    // In fit mode: 100% fits container width & height.
+    // Zoom expands or contracts relative to that container.
+    return {
+      width: `${100 * factor}%`,
+      height: `${100 * factor}%`,
+      maxWidth: factor <= 1 ? "100%" : "none",
+      maxHeight: factor <= 1 ? "100%" : "none",
+    };
+  } else {
+    // Original 1:1 mode: use actual SVG dimensions if available
+    if (dims) {
+      return {
+        width: `${Math.round(dims.width * factor)}px`,
+        height: `${Math.round(dims.height * factor)}px`,
+        minWidth: `${Math.round(dims.width * factor)}px`,
+        minHeight: `${Math.round(dims.height * factor)}px`,
+      };
+    }
+    // Fallback if dimensions not parsed
+    return {
+      transform: `scale(${factor})`,
+      transformOrigin: "center center",
+    };
+  }
 }
 
 export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
@@ -16,8 +55,27 @@ export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
   officialResult,
   mode,
   scaleMode,
+  wasmZoom,
+  onChangeWasmZoom,
+  officialZoom,
+  onChangeOfficialZoom,
   bgSettings,
 }) => {
+  // Extract SVG dimensions
+  const wasmDimensions = useMemo(() => {
+    if (typeof wasmResult?.data === "string") {
+      return getSvgDimensions(wasmResult.data);
+    }
+    return null;
+  }, [wasmResult]);
+
+  const officialDimensions = useMemo(() => {
+    if (officialResult?.svg) {
+      return getSvgDimensions(officialResult.svg);
+    }
+    return null;
+  }, [officialResult]);
+
   // Create object URL for wasm binary raster formats (PNG, WebP)
   const wasmImageUrl = useMemo(() => {
     if (!wasmResult?.data) return null;
@@ -51,11 +109,6 @@ export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
     a.click();
   };
 
-  const svgWrapperClasses =
-    scaleMode === "fit"
-      ? "w-full h-full max-w-full max-h-full flex items-center justify-center [&>svg]:w-full [&>svg]:h-full [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:object-contain"
-      : "flex items-center justify-center [&>svg]:max-w-none";
-
   const bgStyle = getCanvasBgStyle(bgSettings);
 
   return (
@@ -68,8 +121,8 @@ export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
           }`}
         >
           {/* Column Header */}
-          <div className="flex items-center justify-between px-3 py-1.5 bg-slate-800/80 border-b border-slate-700 text-xs shrink-0">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between px-3 py-1.5 bg-slate-800/80 border-b border-slate-700 text-xs shrink-0 gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <a
                 href="https://www.npmjs.com/package/wasm-html-to-image"
                 target="_blank"
@@ -87,16 +140,32 @@ export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
                   {wasmResult.format.toUpperCase()}
                 </span>
               )}
+              {wasmDimensions && (
+                <span
+                  title="Rendered SVG Dimensions"
+                  className="hidden sm:inline-block text-[10px] text-slate-400 font-mono bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-800"
+                >
+                  {wasmDimensions.width}×{wasmDimensions.height}
+                </span>
+              )}
             </div>
-            {wasmResult?.data && !wasmResult.error && (
-              <button
-                type="button"
-                onClick={handleDownloadWasm}
-                className="text-[11px] text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-              >
-                Download
-              </button>
-            )}
+
+            {/* Zoom Control & Download */}
+            <div className="flex items-center gap-2 shrink-0">
+              <ZoomControl
+                zoom={wasmZoom}
+                onChangeZoom={onChangeWasmZoom}
+              />
+              {wasmResult?.data && !wasmResult.error && (
+                <button
+                  type="button"
+                  onClick={handleDownloadWasm}
+                  className="text-[11px] text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                >
+                  Download
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Canvas Scroll Area */}
@@ -104,9 +173,9 @@ export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
             className="flex-1 overflow-auto min-h-0 transition-colors duration-200"
             style={bgStyle.style}
           >
-            <div className="min-w-full min-h-full flex items-center justify-center p-4">
+            <div className="min-w-full min-h-full p-4 flex">
               {wasmResult?.error ? (
-                <div className="p-4 bg-red-950/90 border border-red-700/80 rounded-lg text-red-200 text-xs font-mono max-w-md shadow-xl">
+                <div className="m-auto p-4 bg-red-950/90 border border-red-700/80 rounded-lg text-red-200 text-xs font-mono max-w-md shadow-xl">
                   <div className="flex items-center gap-2 mb-1 text-red-400 font-semibold">
                     <span>WASM Render Error:</span>
                   </div>
@@ -114,21 +183,23 @@ export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
                 </div>
               ) : typeof wasmResult?.data === "string" ? (
                 <div
-                  className={svgWrapperClasses}
+                  className="m-auto flex items-center justify-center transition-all [&>svg]:w-full [&>svg]:h-full [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:object-contain"
+                  style={getDiagramContainerStyle(scaleMode, wasmZoom, wasmDimensions)}
                   dangerouslySetInnerHTML={{ __html: wasmResult.data }}
                 />
               ) : wasmImageUrl ? (
-                <img
-                  src={wasmImageUrl}
-                  alt="WASM Rendered Diagram"
-                  className={
-                    scaleMode === "fit"
-                      ? "max-w-full max-h-full object-contain"
-                      : "max-w-none"
-                  }
-                />
+                <div
+                  className="m-auto flex items-center justify-center transition-all"
+                  style={getDiagramContainerStyle(scaleMode, wasmZoom, null)}
+                >
+                  <img
+                    src={wasmImageUrl}
+                    alt="WASM Rendered Diagram"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
               ) : (
-                <span className="text-xs text-slate-500">No output yet</span>
+                <span className="m-auto text-xs text-slate-500">No output yet</span>
               )}
             </div>
           </div>
@@ -143,8 +214,8 @@ export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
           }`}
         >
           {/* Column Header */}
-          <div className="flex items-center justify-between px-3 py-1.5 bg-slate-800/80 border-b border-slate-700 text-xs shrink-0">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between px-3 py-1.5 bg-slate-800/80 border-b border-slate-700 text-xs shrink-0 gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <a
                 href="https://www.npmjs.com/package/mermaid"
                 target="_blank"
@@ -160,16 +231,32 @@ export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
               <span className="text-[10px] text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700">
                 SVG
               </span>
+              {officialDimensions && (
+                <span
+                  title="Rendered SVG Dimensions"
+                  className="hidden sm:inline-block text-[10px] text-slate-400 font-mono bg-slate-900/60 px-1.5 py-0.5 rounded border border-slate-800"
+                >
+                  {officialDimensions.width}×{officialDimensions.height}
+                </span>
+              )}
             </div>
-            {officialResult?.svg && !officialResult.error && (
-              <button
-                type="button"
-                onClick={handleDownloadOfficial}
-                className="text-[11px] text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
-              >
-                Download
-              </button>
-            )}
+
+            {/* Zoom Control & Download */}
+            <div className="flex items-center gap-2 shrink-0">
+              <ZoomControl
+                zoom={officialZoom}
+                onChangeZoom={onChangeOfficialZoom}
+              />
+              {officialResult?.svg && !officialResult.error && (
+                <button
+                  type="button"
+                  onClick={handleDownloadOfficial}
+                  className="text-[11px] text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                >
+                  Download
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Canvas Scroll Area */}
@@ -177,9 +264,9 @@ export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
             className="flex-1 overflow-auto min-h-0 transition-colors duration-200"
             style={bgStyle.style}
           >
-            <div className="min-w-full min-h-full flex items-center justify-center p-4">
+            <div className="min-w-full min-h-full p-4 flex">
               {officialResult?.error ? (
-                <div className="p-4 bg-red-950/90 border border-red-700/80 rounded-lg text-red-200 text-xs font-mono max-w-md shadow-xl">
+                <div className="m-auto p-4 bg-red-950/90 border border-red-700/80 rounded-lg text-red-200 text-xs font-mono max-w-md shadow-xl">
                   <div className="flex items-center gap-2 mb-1 text-red-400 font-semibold">
                     <span>Official Mermaid Error:</span>
                   </div>
@@ -187,11 +274,12 @@ export const ViewerSideBySide: React.FC<ViewerSideBySideProps> = ({
                 </div>
               ) : officialResult?.svg ? (
                 <div
-                  className={svgWrapperClasses}
+                  className="m-auto flex items-center justify-center transition-all [&>svg]:w-full [&>svg]:h-full [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:object-contain"
+                  style={getDiagramContainerStyle(scaleMode, officialZoom, officialDimensions)}
                   dangerouslySetInnerHTML={{ __html: officialResult.svg }}
                 />
               ) : (
-                <span className="text-xs text-slate-500">No output yet</span>
+                <span className="m-auto text-xs text-slate-500">No output yet</span>
               )}
             </div>
           </div>

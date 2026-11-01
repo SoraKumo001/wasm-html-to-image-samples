@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Header, type ViewMode } from "./components/Header.tsx";
 import { Editor } from "./components/Editor.tsx";
 import { OptionsPanel } from "./components/OptionsPanel.tsx";
@@ -19,6 +19,7 @@ import {
 } from "./utils/renderWasm.ts";
 import { renderOfficial, type OfficialRenderResult } from "./utils/renderOfficial.ts";
 import { settingsFromParams, settingsToParams } from "./utils/urlState.ts";
+import { getSvgDimensions } from "./utils/svgUtils.ts";
 
 export const App: React.FC = () => {
   // the settings live in the query string, so a link reproduces the screen
@@ -28,6 +29,8 @@ export const App: React.FC = () => {
   const [selectedTheme, setSelectedTheme] = useState<MermaidTheme>(initial.theme);
   const [viewMode, setViewMode] = useState<ViewMode>(initial.view);
   const [scaleMode, setScaleMode] = useState<ScaleMode>(initial.scale);
+  const [wasmZoom, setWasmZoom] = useState<number>(initial.wasmZoom);
+  const [officialZoom, setOfficialZoom] = useState<number>(initial.officialZoom);
   const [bgSettings, setBgSettings] = useState<CanvasBgSettings>(initial.bg);
   const [wasmOptions, setWasmOptions] = useState<WasmRenderOptions>(initial.options);
 
@@ -75,11 +78,13 @@ export const App: React.FC = () => {
       theme: selectedTheme,
       view: viewMode,
       scale: scaleMode,
+      wasmZoom,
+      officialZoom,
       bg: bgSettings,
       options: wasmOptions,
     }).toString();
     window.history.replaceState(null, "", query ? `?${query}` : window.location.pathname);
-  }, [selectedPreset, code, selectedTheme, viewMode, scaleMode, bgSettings, wasmOptions]);
+  }, [selectedPreset, code, selectedTheme, viewMode, scaleMode, wasmZoom, officialZoom, bgSettings, wasmOptions]);
 
   const handleSelectPreset = (preset: PresetItem) => {
     setSelectedPreset(preset);
@@ -115,6 +120,37 @@ export const App: React.FC = () => {
     executeRender(code, selectedTheme, wasmOptions);
   };
 
+  // SVG dimensions for matching size
+  const wasmDimensions = useMemo(() => {
+    if (typeof wasmResult?.data === "string") return getSvgDimensions(wasmResult.data);
+    return null;
+  }, [wasmResult]);
+
+  const officialDimensions = useMemo(() => {
+    if (officialResult?.svg) return getSvgDimensions(officialResult.svg);
+    return null;
+  }, [officialResult]);
+
+  const matchRatio = useMemo(() => {
+    if (wasmDimensions && officialDimensions && wasmDimensions.width > 0 && officialDimensions.width > 0) {
+      const r = (officialDimensions.width / wasmDimensions.width) * (officialZoom / 100);
+      return Math.round(r * 100);
+    }
+    return null;
+  }, [wasmDimensions, officialDimensions, officialZoom]);
+
+  const handleMatchSize = useCallback(() => {
+    if (matchRatio != null) {
+      const clamped = Math.max(25, Math.min(400, matchRatio));
+      setWasmZoom(clamped);
+    }
+  }, [matchRatio]);
+
+  const handleResetZoom = useCallback(() => {
+    setWasmZoom(100);
+    setOfficialZoom(100);
+  }, []);
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-900 text-slate-100">
       {/* Top Header */}
@@ -149,12 +185,17 @@ export const App: React.FC = () => {
 
         {/* Right Side: Visual Comparison Viewers */}
         <div className="flex-1 flex flex-col h-3/5 md:h-full overflow-hidden min-h-0">
-          {/* Canvas Sub-toolbar for Background and Scaling */}
+          {/* Canvas Sub-toolbar for Background, Scaling and Matching */}
           <CanvasToolbar
             scaleMode={scaleMode}
             onChangeScaleMode={setScaleMode}
             bgSettings={bgSettings}
             onChangeBgSettings={setBgSettings}
+            hasCustomZoom={wasmZoom !== 100 || officialZoom !== 100}
+            onResetZoom={handleResetZoom}
+            canMatchSize={matchRatio != null && Math.abs(wasmZoom - matchRatio) >= 1}
+            onMatchSize={handleMatchSize}
+            matchRatioInfo={matchRatio ? `Auto-match WASM size to Official (${matchRatio}%)` : undefined}
           />
 
           {viewMode === "slider" ? (
@@ -162,6 +203,10 @@ export const App: React.FC = () => {
               wasmResult={wasmResult}
               officialResult={officialResult}
               scaleMode={scaleMode}
+              wasmZoom={wasmZoom}
+              onChangeWasmZoom={setWasmZoom}
+              officialZoom={officialZoom}
+              onChangeOfficialZoom={setOfficialZoom}
               bgSettings={bgSettings}
             />
           ) : (
@@ -170,6 +215,10 @@ export const App: React.FC = () => {
               officialResult={officialResult}
               mode={viewMode}
               scaleMode={scaleMode}
+              wasmZoom={wasmZoom}
+              onChangeWasmZoom={setWasmZoom}
+              officialZoom={officialZoom}
+              onChangeOfficialZoom={setOfficialZoom}
               bgSettings={bgSettings}
             />
           )}
