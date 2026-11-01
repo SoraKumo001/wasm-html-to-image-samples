@@ -29,6 +29,7 @@ Headless Chrome やブラウザ DOM（D3 等）を一切使わず、ゼロ DOM �
   - **リアルタイムプレビュー**: SVG インライン描画およびラスター画像（WebP/PNG/JPEG）のプレビュー、レンダリング時間 (ms) / データサイズ (KB) 計測
   - **パラメータ調整**: テーマ選択（全10種）、パースモード（strict / compat / recover）、パディング、背景色、ディレクティブ許可、ダウンロードフラグ
   - **ワンクリック共有 / エクスポート**: 生成された GET URL コピー、POST 用 cURL コマンドコピー、ダイアグラムファイルの直接ダウンロード
+  - **ソーシャル共有 (OGP)**: X (Twitter) や Facebook, Slack, Discord 等での共有に対応した 1200x630 OGP 画像（`/og-image.png`）およびファビコン（`/favicon.svg`）を標準装備
 
 ---
 

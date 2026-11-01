@@ -8,6 +8,7 @@ import {
 } from "wasm-html-to-image";
 import { PRESETS } from "./presets.js";
 import { renderPlaygroundHtml } from "./playground.js";
+import { generateFaviconSvg, generateOgpSvg, handleOgpPng } from "./ogp.js";
 
 const app = new Hono();
 
@@ -29,9 +30,33 @@ const CONTENT_TYPES: Record<string, string> = {
   pdf: "application/pdf",
 };
 
+// --- Static / OGP & Favicon assets ---
+app.get("/favicon.svg", (c) =>
+  c.body(generateFaviconSvg(), 200, {
+    "Content-Type": "image/svg+xml; charset=utf-8",
+    "Cache-Control": "public, max-age=604800, immutable",
+  }),
+);
+
+app.get("/og-image.svg", (c) =>
+  c.body(generateOgpSvg(), 200, {
+    "Content-Type": "image/svg+xml; charset=utf-8",
+    "Cache-Control": "public, max-age=604800, immutable",
+  }),
+);
+
+app.get("/og-image.png", (c) => handleOgpPng(c));
+app.get("/og.png", (c) => handleOgpPng(c));
+
 // --- Playground endpoints ---
-app.get("/playground", (c) => c.html(renderPlaygroundHtml()));
-app.get("/ui", (c) => c.html(renderPlaygroundHtml()));
+app.get("/playground", (c) => {
+  const origin = new URL(c.req.url).origin;
+  return c.html(renderPlaygroundHtml(origin));
+});
+app.get("/ui", (c) => {
+  const origin = new URL(c.req.url).origin;
+  return c.html(renderPlaygroundHtml(origin));
+});
 
 // --- API: Presets list ---
 app.get("/api/presets", (c) => c.json(PRESETS));

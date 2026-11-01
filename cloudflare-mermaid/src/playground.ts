@@ -1,7 +1,7 @@
 import { PRESETS } from "./presets.js";
 import { MERMAID_THEMES } from "wasm-html-to-image";
 
-export function renderPlaygroundHtml(): string {
+export function renderPlaygroundHtml(origin: string = ""): string {
   const themeOptions = Object.keys(MERMAID_THEMES)
     .map((theme) => `<option value="${theme}" ${theme === "light" ? "selected" : ""}>${theme}</option>`)
     .join("");
@@ -30,7 +30,32 @@ export function renderPlaygroundHtml(): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cloudflare Mermaid Playground ⚡</title>
+  <title>Cloudflare Mermaid Playground ⚡ - WASM Powered Microservice</title>
+  <meta name="description" content="Cloudflare Workers 上で WASM エンジンを活用し、Mermaid ダイアグラムをオンザフライで SVG / WebP / PNG / JPEG 等に高速変換・配信するプレイグラウンド。全26種プリセット、10テーマ、構文自動修復に対応。">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" type="image/svg+xml" href="${origin}/favicon.svg">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${origin}/playground">
+  <meta property="og:site_name" content="Cloudflare Mermaid">
+  <meta property="og:title" content="Cloudflare Mermaid Playground ⚡ - WASM Powered Microservice">
+  <meta property="og:description" content="Cloudflare Workers WASM エンジンによる超高速 Mermaid レンダリングマイクロサービス。SVG/WebP/PNG/JPEG 変換や各種テーマ、構文修復、パラメータ調整をリアルタイムに試せるプレイグラウンド。">
+  <meta property="og:image" content="${origin}/og-image.png">
+  <meta property="og:image:secure_url" content="${origin}/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Cloudflare Mermaid Playground - Zero-DOM WASM diagram renderer preview">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="${origin}/playground">
+  <meta name="twitter:title" content="Cloudflare Mermaid Playground ⚡ - WASM Powered Microservice">
+  <meta name="twitter:description" content="Cloudflare Workers WASM エンジンによる超高速 Mermaid レンダリングマイクロサービス。SVG/WebP/PNG/JPEG 変換や各種テーマ、構文修復、パラメータ調整をリアルタイムに試せるプレイグラウンド。">
+  <meta name="twitter:image" content="${origin}/og-image.png">
+  <meta name="twitter:image:alt" content="Cloudflare Mermaid Playground - Zero-DOM WASM diagram renderer preview">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {

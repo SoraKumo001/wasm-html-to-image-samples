@@ -149,7 +149,7 @@ async function main() {
     if (postRes.status !== 200) throw new Error(`expected 200 for POST, got ${postRes.status}`);
     if (!postSvg.includes("<svg")) throw new Error(`expected SVG in POST response`);
 
-    // 5) Test GET /playground -> returns HTML form UI
+    // 5) Test GET /playground -> returns HTML form UI with OGP tags
     console.log("[smoke] Test 5: GET /playground");
     const playgroundRes = await fetch(`http://127.0.0.1:${port}/playground`);
     const playgroundHtml = await playgroundRes.text();
@@ -158,6 +158,8 @@ async function main() {
     if (playgroundRes.status !== 200) throw new Error(`expected 200 for playground, got ${playgroundRes.status}`);
     if (!playgroundContentType.includes("text/html")) throw new Error(`expected text/html, got ${playgroundContentType}`);
     if (!playgroundHtml.includes("Cloudflare Mermaid Playground")) throw new Error(`expected title in playground HTML`);
+    if (!playgroundHtml.includes(`og:image`)) throw new Error(`expected og:image meta tag in playground HTML`);
+    if (!playgroundHtml.includes(`twitter:image`)) throw new Error(`expected twitter:image meta tag in playground HTML`);
 
     // 6) Test GET /api/presets -> returns JSON array
     console.log("[smoke] Test 6: GET /api/presets");
@@ -166,6 +168,36 @@ async function main() {
     console.log(`[smoke] GET /api/presets -> status=${presetsRes.status} count=${presetsJson.length}`);
     if (presetsRes.status !== 200) throw new Error(`expected 200 for presets, got ${presetsRes.status}`);
     if (!Array.isArray(presetsJson) || presetsJson.length === 0) throw new Error(`expected non-empty presets array`);
+
+    // 7) Test GET /og-image.svg -> returns OGP SVG
+    console.log("[smoke] Test 7: GET /og-image.svg");
+    const ogSvgRes = await fetch(`http://127.0.0.1:${port}/og-image.svg`);
+    const ogSvgText = await ogSvgRes.text();
+    const ogSvgContentType = ogSvgRes.headers.get("content-type") ?? "";
+    console.log(`[smoke] GET /og-image.svg -> status=${ogSvgRes.status} contentType=${ogSvgContentType} len=${ogSvgText.length}`);
+    if (ogSvgRes.status !== 200) throw new Error(`expected 200 for og-image.svg, got ${ogSvgRes.status}`);
+    if (!ogSvgContentType.includes("image/svg+xml")) throw new Error(`expected image/svg+xml, got ${ogSvgContentType}`);
+    if (!ogSvgText.includes("<svg")) throw new Error(`expected SVG content in og-image.svg`);
+
+    // 8) Test GET /og-image.png -> returns 1200x630 OGP PNG binary
+    console.log("[smoke] Test 8: GET /og-image.png");
+    const ogPngRes = await fetch(`http://127.0.0.1:${port}/og-image.png`);
+    const ogPngBuf = new Uint8Array(await ogPngRes.arrayBuffer());
+    const ogPngContentType = ogPngRes.headers.get("content-type") ?? "";
+    console.log(`[smoke] GET /og-image.png -> status=${ogPngRes.status} contentType=${ogPngContentType} bytes=${ogPngBuf.length} head=${headHex(ogPngBuf)}`);
+    if (ogPngRes.status !== 200) throw new Error(`expected 200 for og-image.png, got ${ogPngRes.status}`);
+    if (!ogPngContentType.includes("image/png")) throw new Error(`expected image/png, got ${ogPngContentType}`);
+    if (headHex(ogPngBuf) !== PNG_MAGIC) throw new Error(`expected PNG magic, got ${headHex(ogPngBuf)}`);
+
+    // 9) Test GET /favicon.svg -> returns favicon SVG
+    console.log("[smoke] Test 9: GET /favicon.svg");
+    const favRes = await fetch(`http://127.0.0.1:${port}/favicon.svg`);
+    const favText = await favRes.text();
+    const favContentType = favRes.headers.get("content-type") ?? "";
+    console.log(`[smoke] GET /favicon.svg -> status=${favRes.status} contentType=${favContentType} len=${favText.length}`);
+    if (favRes.status !== 200) throw new Error(`expected 200 for favicon.svg, got ${favRes.status}`);
+    if (!favContentType.includes("image/svg+xml")) throw new Error(`expected image/svg+xml, got ${favContentType}`);
+    if (!favText.includes("<svg")) throw new Error(`expected SVG content in favicon.svg`);
 
     console.log("[smoke] ALL TESTS PASSED SUCCESSFULLY! 🎉");
   } catch (err) {

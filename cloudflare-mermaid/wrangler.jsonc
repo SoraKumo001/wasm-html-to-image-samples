@@ -2,9 +2,8 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "cloudflare-mermaid",
   "main": "src/index.ts",
-  "compatibility_date": "2025-02-04",
-  "rules": [{ "type": "CompiledWasm", "globs": ["**/*.wasm"], "fallthrough": false }],
+  "compatibility_date": "2026-10-30",
   "observability": {
-    "enabled": true
-  }
+    "enabled": true,
+  },
 }
