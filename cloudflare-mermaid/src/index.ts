@@ -8,7 +8,7 @@ import {
 } from "wasm-html-to-image";
 import { PRESETS } from "./presets.js";
 import { renderPlaygroundHtml } from "./playground.js";
-import { generateFaviconSvg, generateOgpSvg, handleOgpPng } from "./ogp.js";
+import { generateFaviconSvg, handleOgpPng } from "./ogp.js";
 
 const app = new Hono();
 
@@ -29,37 +29,6 @@ const CONTENT_TYPES: Record<string, string> = {
   avif: "image/avif",
   pdf: "application/pdf",
 };
-
-// --- Static / OGP & Favicon assets ---
-app.get("/favicon.svg", (c) =>
-  c.body(generateFaviconSvg(), 200, {
-    "Content-Type": "image/svg+xml; charset=utf-8",
-    "Cache-Control": "public, max-age=604800, immutable",
-  }),
-);
-
-app.get("/og-image.svg", (c) =>
-  c.body(generateOgpSvg(), 200, {
-    "Content-Type": "image/svg+xml; charset=utf-8",
-    "Cache-Control": "public, max-age=604800, immutable",
-  }),
-);
-
-app.get("/og-image.png", (c) => handleOgpPng(c));
-app.get("/og.png", (c) => handleOgpPng(c));
-
-// --- Playground endpoints ---
-app.get("/playground", (c) => {
-  const origin = new URL(c.req.url).origin;
-  return c.html(renderPlaygroundHtml(origin));
-});
-app.get("/ui", (c) => {
-  const origin = new URL(c.req.url).origin;
-  return c.html(renderPlaygroundHtml(origin));
-});
-
-// --- API: Presets list ---
-app.get("/api/presets", (c) => c.json(PRESETS));
 
 // --- Render handler (API) ---
 async function handleRender(c: Context) {
@@ -93,15 +62,10 @@ async function handleRender(c: Context) {
   }
 
   if (!code) {
-    code =
-      c.req.query("code") ||
-      c.req.query("mermaid") ||
-      DEFAULT_MERMAID;
+    code = c.req.query("code") || c.req.query("mermaid") || DEFAULT_MERMAID;
   }
 
-  const format = (
-    c.req.query("format") || "svg"
-  ).toLowerCase() as OutputFormat;
+  const format = (c.req.query("format") || "svg").toLowerCase() as OutputFormat;
   const themeParam = c.req.query("theme") || "light";
   const theme: MermaidTheme =
     themeParam in MERMAID_THEMES ? (themeParam as MermaidTheme) : "light";
@@ -109,13 +73,12 @@ async function handleRender(c: Context) {
     | "strict"
     | "compat"
     | "recover";
-  const bg =
-    c.req.query("bg") ||
-    c.req.query("background") ||
-    undefined;
+  const bg = c.req.query("bg") || c.req.query("background") || undefined;
   const paddingParam = c.req.query("padding");
   const padding =
-    paddingParam !== undefined ? Math.max(0, parseInt(paddingParam, 10) || 0) : 16;
+    paddingParam !== undefined
+      ? Math.max(0, parseInt(paddingParam, 10) || 0)
+      : 16;
   const directives = c.req.query("directives") !== "false";
   const isDownload = c.req.query("download") === "true";
 
@@ -132,8 +95,7 @@ async function handleRender(c: Context) {
       format,
     });
 
-    const contentType =
-      CONTENT_TYPES[format] || "image/svg+xml; charset=utf-8";
+    const contentType = CONTENT_TYPES[format] || "image/svg+xml; charset=utf-8";
     const headers = new Headers({
       "Content-Type": contentType,
       "Cache-Control": "public, max-age=31536000, immutable",
@@ -176,6 +138,30 @@ async function handleRender(c: Context) {
   }
 }
 
-app.on(["GET", "POST"], "*", handleRender);
+app.on(["GET", "POST"], "/", handleRender);
+
+// --- Static / OGP & Favicon assets ---
+app.get("/favicon.svg", (c) =>
+  c.body(generateFaviconSvg(), 200, {
+    "Content-Type": "image/svg+xml; charset=utf-8",
+    "Cache-Control": "public, max-age=604800, immutable",
+  }),
+);
+
+app.get("/og-image.png", (c) => handleOgpPng(c));
+app.get("/og.png", (c) => handleOgpPng(c));
+
+// --- Playground endpoints ---
+app.get("/playground", (c) => {
+  const origin = new URL(c.req.url).origin;
+  return c.html(renderPlaygroundHtml(origin));
+});
+app.get("/ui", (c) => {
+  const origin = new URL(c.req.url).origin;
+  return c.html(renderPlaygroundHtml(origin));
+});
+
+// --- API: Presets list ---
+app.get("/api/presets", (c) => c.json(PRESETS));
 
 export default app;

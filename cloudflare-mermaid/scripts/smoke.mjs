@@ -174,18 +174,8 @@ async function main() {
     if (presetsRes.status !== 200) throw new Error(`expected 200 for presets, got ${presetsRes.status}`);
     if (!Array.isArray(presetsJson) || presetsJson.length === 0) throw new Error(`expected non-empty presets array`);
 
-    // 7) Test GET /og-image.svg -> returns OGP SVG
-    console.log("[smoke] Test 7: GET /og-image.svg");
-    const ogSvgRes = await fetch(`http://127.0.0.1:${port}/og-image.svg`);
-    const ogSvgText = await ogSvgRes.text();
-    const ogSvgContentType = ogSvgRes.headers.get("content-type") ?? "";
-    console.log(`[smoke] GET /og-image.svg -> status=${ogSvgRes.status} contentType=${ogSvgContentType} len=${ogSvgText.length}`);
-    if (ogSvgRes.status !== 200) throw new Error(`expected 200 for og-image.svg, got ${ogSvgRes.status}`);
-    if (!ogSvgContentType.includes("image/svg+xml")) throw new Error(`expected image/svg+xml, got ${ogSvgContentType}`);
-    if (!ogSvgText.includes("<svg")) throw new Error(`expected SVG content in og-image.svg`);
-
-    // 8) Test GET /og-image.png -> returns 1200x630 OGP PNG binary
-    console.log("[smoke] Test 8: GET /og-image.png");
+    // 7) Test GET /og-image.png -> returns 1200x630 OGP PNG binary
+    console.log("[smoke] Test 7: GET /og-image.png");
     const ogPngRes = await fetch(`http://127.0.0.1:${port}/og-image.png`);
     const ogPngBuf = new Uint8Array(await ogPngRes.arrayBuffer());
     const ogPngContentType = ogPngRes.headers.get("content-type") ?? "";
@@ -194,8 +184,8 @@ async function main() {
     if (!ogPngContentType.includes("image/png")) throw new Error(`expected image/png, got ${ogPngContentType}`);
     if (headHex(ogPngBuf) !== PNG_MAGIC) throw new Error(`expected PNG magic, got ${headHex(ogPngBuf)}`);
 
-    // 9) Test GET /favicon.svg -> returns favicon SVG
-    console.log("[smoke] Test 9: GET /favicon.svg");
+    // 8) Test GET /favicon.svg -> returns favicon SVG
+    console.log("[smoke] Test 8: GET /favicon.svg");
     const favRes = await fetch(`http://127.0.0.1:${port}/favicon.svg`);
     const favText = await favRes.text();
     const favContentType = favRes.headers.get("content-type") ?? "";
