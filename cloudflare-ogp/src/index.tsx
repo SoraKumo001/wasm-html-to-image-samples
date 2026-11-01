@@ -1,15 +1,25 @@
 import { Hono } from "hono";
 import { render } from "wasm-html-to-image/workerd";
 import { createCSS } from "wasm-html-to-image/tailwind";
+import defaultImageBuffer from "../assets/image.jpg";
+
+function toBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i += 8192) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
+  }
+  return btoa(binary);
+}
+
+const DEFAULT_IMAGE = `data:image/jpeg;base64,${toBase64(defaultImageBuffer)}`;
 
 const app = new Hono();
 
 app.get("/", async (c) => {
   const subtitle = c.req.query("subtitle") ?? "subtitle";
   const title = c.req.query("title") ?? "Title";
-  const image =
-    c.req.query("image") ??
-    "https://raw.githubusercontent.com/SoraKumo001/cloudflare-ogp/refs/heads/master/sample/image.jpg";
+  const image = c.req.query("image") ?? DEFAULT_IMAGE;
   const cache = await caches.open("satoru-cloudflare-ogp");
   const cacheKey = new Request(c.req.url);
 
