@@ -1,5 +1,7 @@
 # cloudflare-mermaid
 
+https://cloudflare-mermaid.mofon001.workers.dev/ui
+
 Cloudflare Workers 上で [`wasm-html-to-image`](https://www.npmjs.com/package/wasm-html-to-image) のネイティブ WASM エンジンを活用し、Mermaid ダイアグラムをオンザフライで **SVG / WebP / PNG / JPEG** 等に変換・配信する超軽量マイクロサービスです。
 
 Headless Chrome やブラウザ DOM（D3 等）を一切使わず、ゼロ DOM かつエッジ環境で高速にレンダリングします。
