@@ -1,32 +1,21 @@
-/** @jsx h */
-import { h, toHtml } from "wasm-html-to-image/preact";
+import { Hono } from "hono";
 import { render } from "wasm-html-to-image/workerd";
 import { createCSS } from "wasm-html-to-image/tailwind";
 
-const fetch = async (
-  request: Request,
-  _env: object,
-  ctx: ExecutionContext,
-): Promise<Response> => {
-  const url = new URL(request.url);
-  if (url.pathname !== "/") {
-    return new Response(null, { status: 404 });
-  }
-  const subtitle = url.searchParams.get("subtitle") ?? "subtitle";
-  const title = url.searchParams.get("title") ?? "Title";
+const app = new Hono();
+
+app.get("/", async (c) => {
+  const subtitle = c.req.query("subtitle") ?? "subtitle";
+  const title = c.req.query("title") ?? "Title";
   const image =
-    url.searchParams.get("image") ??
+    c.req.query("image") ??
     "https://raw.githubusercontent.com/SoraKumo001/cloudflare-ogp/refs/heads/master/sample/image.jpg";
   const cache = await caches.open("satoru-cloudflare-ogp");
-  const cacheKey = new Request(url.toString());
-  // const cachedResponse = await cache.match(cacheKey);
-  // if (cachedResponse) {
-  //   return cachedResponse;
-  // }
+  const cacheKey = new Request(c.req.url);
 
   // Define OGP layout using JSX
   // We include @font-face in a style tag inside the HTML
-  const html = toHtml(
+  const html = (
     <html className="m-0 p-0">
       <head>
         <link
@@ -75,8 +64,9 @@ const fetch = async (
           </div>
         </div>
       </body>
-    </html>,
-  );
+    </html>
+  ).toString();
+
   // Render to PNG with automatic font resolution
   const png = await render({
     value: html,
@@ -96,10 +86,8 @@ const fetch = async (
       cacheTtl: 31536000,
     },
   });
-  ctx.waitUntil(cache.put(cacheKey, response.clone()));
+  c.executionCtx.waitUntil(cache.put(cacheKey, response.clone()));
   return response;
-};
+});
 
-export default {
-  fetch,
-};
+export default app;

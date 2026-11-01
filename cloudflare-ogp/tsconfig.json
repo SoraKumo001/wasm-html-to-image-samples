@@ -3,14 +3,14 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "jsx": "react",
-    "jsxFactory": "h",
     "strict": true,
     "skipLibCheck": true,
     "lib": ["ESNext", "WebWorker"],
-    "types": ["@cloudflare/workers-types", "preact/jsx-runtime"],
+    "types": ["@cloudflare/workers-types"],
     "isolatedModules": true,
     "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
     "noEmit": true
   },
   "include": ["src"]
