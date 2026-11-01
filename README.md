@@ -27,7 +27,7 @@ pnpm -r build
 | [**`next-image-convert`**](./next-image-convert/)                 | Client-Side Image Converter | Next.js 16 (App Router)     | Turbopack + Tailwind CSS v4 | `wasm-html-to-image/workers`                                                                 |
 | [**`react-router-image-convert`**](./react-router-image-convert/) | Client-Side Image Converter | React Router v7             | Vite 7 + Tailwind CSS v4    | `wasm-html-to-image/workers`                                                                 |
 | [**`node-image-convert`**](./node-image-convert/)                 | CLI Batch Converter         | Node.js (ESM)               | TypeScript (`tsc -b`), tsx  | `wasm-html-to-image/single`<br>`wasm-html-to-image/workers`                                  |
-| [**`cloudflare-ogp`**](./cloudflare-ogp/)                         | Dynamic OGP Generator       | Cloudflare Workers (Preact) | Wrangler                    | `wasm-html-to-image/workerd`<br>`wasm-html-to-image/preact`<br>`wasm-html-to-image/tailwind` |
+| [**`cloudflare-ogp`**](./cloudflare-ogp/)                         | Dynamic OGP Generator       | Cloudflare Workers (Hono)   | Wrangler                    | `wasm-html-to-image/workerd`<br>`wasm-html-to-image/tailwind` |
 | [**`cloudflare-mermaid`**](./cloudflare-mermaid/)                 | On-the-fly Mermaid API      | Cloudflare Workers (workerd)| Wrangler                    | `wasm-html-to-image/workerd`                                                                 |
 
 ---
@@ -121,14 +121,23 @@ Batch image conversion CLI utility on Node.js with single-threaded and multi-thr
 
 ### 6. [cloudflare-ogp](./cloudflare-ogp/)
 
-Dynamic Social Preview (OGP) image generation running at the edge using Preact and Tailwind CSS.
+Dynamic Social Preview (OGP) image generation running at the edge using Hono JSX, native Mermaid diagrams, and Tailwind CSS.
 
-- **Build Tool**: Wrangler, Preact 10, TypeScript
+- **Build Tool**: Wrangler, Hono 4, TypeScript
 - **Package Feature**:
-  - Uses `toHtml` from `wasm-html-to-image/preact` to render Preact JSX components to HTML.
+  - Uses Hono JSX to construct rich, responsive OGP layouts at the edge.
+  - Native Mermaid diagram rendering directly within HTML via `<div class="mermaid">`.
   - Uses `createCSS` from `wasm-html-to-image/tailwind` to extract utility classes and dynamically generate Tailwind styles.
+  - Bundles local assets via Wrangler Data rules without external network dependencies.
   - Renders to PNG at the edge via `wasm-html-to-image/workerd`.
-    pnpm --filter cloudflare-ogp test
+- **Run / Test**:
+  ```bash
+  pnpm --filter cloudflare-ogp test
+  ```
+
+---
+
+### 7. [cloudflare-image-optimization](./cloudflare-image-optimization/)
 
 Edge image optimization and resizing proxy for Next.js (`next/image` compatible).
 
