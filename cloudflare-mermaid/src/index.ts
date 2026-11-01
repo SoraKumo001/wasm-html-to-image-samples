@@ -6,6 +6,8 @@ import {
   type MermaidTheme,
   type OutputFormat,
 } from "wasm-html-to-image";
+import { PRESETS } from "./presets.js";
+import { renderPlaygroundHtml } from "./playground.js";
 
 const app = new Hono();
 
@@ -27,6 +29,14 @@ const CONTENT_TYPES: Record<string, string> = {
   pdf: "application/pdf",
 };
 
+// --- Playground endpoints ---
+app.get("/playground", (c) => c.html(renderPlaygroundHtml()));
+app.get("/ui", (c) => c.html(renderPlaygroundHtml()));
+
+// --- API: Presets list ---
+app.get("/api/presets", (c) => c.json(PRESETS));
+
+// --- Render handler (API) ---
 async function handleRender(c: Context) {
   // Cache lookup for GET requests
   const cache = await caches.open("cloudflare-mermaid");

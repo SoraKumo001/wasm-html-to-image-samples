@@ -149,6 +149,24 @@ async function main() {
     if (postRes.status !== 200) throw new Error(`expected 200 for POST, got ${postRes.status}`);
     if (!postSvg.includes("<svg")) throw new Error(`expected SVG in POST response`);
 
+    // 5) Test GET /playground -> returns HTML form UI
+    console.log("[smoke] Test 5: GET /playground");
+    const playgroundRes = await fetch(`http://127.0.0.1:${port}/playground`);
+    const playgroundHtml = await playgroundRes.text();
+    const playgroundContentType = playgroundRes.headers.get("content-type") ?? "";
+    console.log(`[smoke] GET /playground -> status=${playgroundRes.status} contentType=${playgroundContentType} len=${playgroundHtml.length}`);
+    if (playgroundRes.status !== 200) throw new Error(`expected 200 for playground, got ${playgroundRes.status}`);
+    if (!playgroundContentType.includes("text/html")) throw new Error(`expected text/html, got ${playgroundContentType}`);
+    if (!playgroundHtml.includes("Cloudflare Mermaid Playground")) throw new Error(`expected title in playground HTML`);
+
+    // 6) Test GET /api/presets -> returns JSON array
+    console.log("[smoke] Test 6: GET /api/presets");
+    const presetsRes = await fetch(`http://127.0.0.1:${port}/api/presets`);
+    const presetsJson = await presetsRes.json();
+    console.log(`[smoke] GET /api/presets -> status=${presetsRes.status} count=${presetsJson.length}`);
+    if (presetsRes.status !== 200) throw new Error(`expected 200 for presets, got ${presetsRes.status}`);
+    if (!Array.isArray(presetsJson) || presetsJson.length === 0) throw new Error(`expected non-empty presets array`);
+
     console.log("[smoke] ALL TESTS PASSED SUCCESSFULLY! 🎉");
   } catch (err) {
     console.error(`[smoke] FAILED: ${err?.stack ?? err}`);
