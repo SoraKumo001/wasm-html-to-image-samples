@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="favBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#favBg)" />
+  <!-- Diagram node connectors & lightning bolt -->
+  <path d="M 16 38 L 26 24 L 38 40 L 48 26" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="16" cy="38" r="4" fill="#ffffff" />
+  <circle cx="26" cy="24" r="4" fill="#38bdf8" />
+  <circle cx="38" cy="40" r="4" fill="#818cf8" />
+  <circle cx="48" cy="26" r="4" fill="#ffffff" />
+  <path d="M 33 12 L 23 30 L 31 30 L 29 48 L 41 28 L 33 28 Z" fill="#facc15" />
+</svg>

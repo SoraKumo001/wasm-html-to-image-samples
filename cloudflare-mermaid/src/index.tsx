@@ -8,7 +8,7 @@ import {
 } from "wasm-html-to-image";
 import { PRESETS } from "./presets.js";
 import { Playground } from "./playground.js";
-import { generateFaviconSvg, handleOgpPng } from "./ogp.js";
+import { handleOgpPng } from "./ogp.js";
 
 const app = new Hono();
 
@@ -140,13 +140,7 @@ async function handleRender(c: Context) {
 
 app.on(["GET", "POST"], "/", handleRender);
 
-// --- Static / OGP & Favicon assets ---
-app.get("/favicon.svg", (c) =>
-  c.body(generateFaviconSvg(), 200, {
-    "Content-Type": "image/svg+xml; charset=utf-8",
-    "Cache-Control": "public, max-age=604800, immutable",
-  }),
-);
+// --- OGP endpoint ---
 
 app.get("/og.png", (c) => handleOgpPng(c));
 
