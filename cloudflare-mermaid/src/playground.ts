@@ -294,10 +294,13 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       <div class="border-t border-slate-800 bg-slate-900/80 p-3 flex flex-col gap-2 shrink-0">
         <div>
           <div class="flex items-center justify-between mb-1">
-            <span class="text-[11px] font-semibold text-slate-400">Request URL (GET)</span>
-            <div class="flex items-center gap-2">
+            <span class="text-[11px] font-semibold text-slate-400">Request URL (GET) &amp; Share</span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button id="copyPageUrlBtn" type="button" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 transition-colors">
+                Copy Page Link
+              </button>
               <button id="copyUrlBtn" type="button" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 transition-colors">
-                Copy URL
+                Copy Raw URL
               </button>
               <button id="copyCurlBtn" type="button" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 transition-colors">
                 Copy cURL
@@ -340,6 +343,7 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       metricTime: document.getElementById('metricTime'),
       metricSize: document.getElementById('metricSize'),
       requestUrlInput: document.getElementById('requestUrlInput'),
+      copyPageUrlBtn: document.getElementById('copyPageUrlBtn'),
       copyUrlBtn: document.getElementById('copyUrlBtn'),
       copyCurlBtn: document.getElementById('copyCurlBtn'),
       openNewTabBtn: document.getElementById('openNewTabBtn'),
@@ -349,18 +353,27 @@ export function renderPlaygroundHtml(origin: string = ""): string {
     let debounceTimer = null;
     let currentBlobUrl = null;
 
-    // Initialize with first preset
-    function loadPreset(presetId) {
+    const STORAGE_KEY_PRESET = 'cf_mermaid_preset';
+
+    // Load preset by ID and optionally force recommended mode
+    function loadPreset(presetId, updateCode = true) {
       const preset = PRESETS.find(p => p.id === presetId) || PRESETS[0];
-      dom.codeInput.value = preset.code;
+      dom.presetSelect.value = preset.id;
       dom.presetDesc.textContent = preset.description || '';
-      if (preset.recommendedMode) {
-        dom.modeSelect.value = preset.recommendedMode;
+      try {
+        localStorage.setItem(STORAGE_KEY_PRESET, preset.id);
+      } catch (e) {}
+
+      if (updateCode) {
+        dom.codeInput.value = preset.code;
+        if (preset.recommendedMode) {
+          dom.modeSelect.value = preset.recommendedMode;
+        }
       }
     }
 
     // Set background color helper
-    function setBackgroundColor(color) {
+    function setBackgroundColor(color, triggerRender = true) {
       dom.bgInput.value = color;
       if (color.startsWith('#') && (color.length === 7 || color.length === 4)) {
         dom.bgColorPicker.value = color.length === 4 
@@ -369,7 +382,10 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       }
       updatePreviewBackground();
       updateUrlDisplay();
-      scheduleAutoRender();
+      syncAddressBarUrl();
+      if (triggerRender) {
+        scheduleAutoRender();
+      }
     }
 
     function updatePreviewBackground() {
@@ -386,7 +402,7 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       }
     }
 
-    // Build URL query string
+    // Build URL query string for Raw API (GET /)
     function buildQuery(download = false) {
       const params = new URLSearchParams();
       const code = dom.codeInput.value.trim();
@@ -402,11 +418,124 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       if (theme !== 'light') params.set('theme', theme);
       if (mode !== 'strict') params.set('mode', mode);
       if (padding && padding !== '16') params.set('padding', padding);
-      if (bg) params.set('bg', bg);
+      if (bg && bg !== '#ffffff') params.set('bg', bg);
       if (!directives) params.set('directives', 'false');
       if (download || dom.downloadCheck.checked) params.set('download', 'true');
 
       return params;
+    }
+
+    // Sync state into browser address bar (window.location.search)
+    function syncAddressBarUrl() {
+      const params = new URLSearchParams();
+      const currentPreset = PRESETS.find(p => p.id === dom.presetSelect.value) || PRESETS[0];
+      const code = dom.codeInput.value.trim();
+
+      // Always save preset ID to URL and localStorage
+      params.set('preset', currentPreset.id);
+      try {
+        localStorage.setItem(STORAGE_KEY_PRESET, currentPreset.id);
+      } catch (e) {}
+
+      // If code was customized from the preset's original code, save code parameter
+      if (code && code !== currentPreset.code.trim()) {
+        params.set('code', code);
+      }
+
+      const format = dom.formatSelect.value;
+      if (format !== 'svg') params.set('format', format);
+
+      const theme = dom.themeSelect.value;
+      if (theme !== 'light') params.set('theme', theme);
+
+      const mode = dom.modeSelect.value;
+      const defaultMode = currentPreset.recommendedMode || 'strict';
+      if (mode !== defaultMode) params.set('mode', mode);
+
+      const padding = dom.paddingInput.value;
+      if (padding && padding !== '16') params.set('padding', padding);
+
+      const bg = dom.bgInput.value.trim();
+      if (bg && bg !== '#ffffff') params.set('bg', bg);
+
+      if (!dom.directivesCheck.checked) params.set('directives', 'false');
+      if (dom.downloadCheck.checked) params.set('download', 'true');
+
+      const queryString = params.toString();
+      const newPath = queryString ? \`\${window.location.pathname}?\${queryString}\` : window.location.pathname;
+      window.history.replaceState(null, '', newPath);
+    }
+
+    // Read state from URL on initial load or popstate (falls back to localStorage)
+    function loadStateFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+
+      // 1. Preset (check URL parameter first, fallback to localStorage)
+      let presetId = params.get('preset');
+      if (!presetId) {
+        try {
+          presetId = localStorage.getItem(STORAGE_KEY_PRESET);
+        } catch (e) {}
+      }
+      const matchedPreset = PRESETS.find(p => p.id === presetId);
+      if (matchedPreset) {
+        dom.presetSelect.value = matchedPreset.id;
+      }
+      const activePreset = PRESETS.find(p => p.id === dom.presetSelect.value) || PRESETS[0];
+      dom.presetDesc.textContent = activePreset.description || '';
+
+      // 2. Code
+      const codeParam = params.get('code') || params.get('mermaid');
+      if (codeParam !== null && codeParam.trim().length > 0) {
+        dom.codeInput.value = codeParam;
+      } else {
+        dom.codeInput.value = activePreset.code;
+      }
+
+      // 3. Theme
+      const themeParam = params.get('theme');
+      if (themeParam && dom.themeSelect.querySelector(\`option[value="\${themeParam}"]\`)) {
+        dom.themeSelect.value = themeParam;
+      }
+
+      // 4. Format
+      const formatParam = params.get('format');
+      if (formatParam && dom.formatSelect.querySelector(\`option[value="\${formatParam}"]\`)) {
+        dom.formatSelect.value = formatParam;
+      }
+
+      // 5. Mode
+      const modeParam = params.get('mode');
+      if (modeParam && ['strict', 'compat', 'recover'].includes(modeParam)) {
+        dom.modeSelect.value = modeParam;
+      } else if (codeParam === null && activePreset.recommendedMode) {
+        dom.modeSelect.value = activePreset.recommendedMode;
+      }
+
+      // 6. Padding
+      const paddingParam = params.get('padding');
+      if (paddingParam !== null && !isNaN(parseInt(paddingParam, 10))) {
+        dom.paddingInput.value = paddingParam;
+      }
+
+      // 7. Background
+      const bgParam = params.get('bg') || params.get('background');
+      if (bgParam !== null) {
+        setBackgroundColor(bgParam, false);
+      } else {
+        setBackgroundColor('#ffffff', false);
+      }
+
+      // 8. Directives
+      const directivesParam = params.get('directives');
+      if (directivesParam === 'false' || directivesParam === 'off') {
+        dom.directivesCheck.checked = false;
+      }
+
+      // 9. Download
+      if (params.get('download') === 'true') {
+        dom.downloadCheck.checked = true;
+      }
     }
 
     function updateUrlDisplay() {
@@ -421,6 +550,7 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       const format = dom.formatSelect.value;
       updatePreviewBackground();
       updateUrlDisplay();
+      syncAddressBarUrl();
 
       dom.spinner.classList.remove('hidden');
       dom.renderBtnText.textContent = 'Rendering...';
@@ -431,7 +561,6 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       try {
         // Use POST to avoid URL length issues with larger diagrams
         const params = buildQuery();
-        // Remove code from params for POST body
         params.delete('code');
         const postUrl = \`/?\${params.toString()}\`;
 
@@ -482,6 +611,7 @@ export function renderPlaygroundHtml(origin: string = ""): string {
     }
 
     function scheduleAutoRender() {
+      syncAddressBarUrl();
       if (!dom.autoRenderCheck.checked) return;
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(executeRender, 350);
@@ -489,8 +619,9 @@ export function renderPlaygroundHtml(origin: string = ""): string {
 
     // Event Listeners
     dom.presetSelect.addEventListener('change', (e) => {
-      loadPreset(e.target.value);
+      loadPreset(e.target.value, true);
       updateUrlDisplay();
+      syncAddressBarUrl();
       executeRender();
     });
 
@@ -522,14 +653,14 @@ export function renderPlaygroundHtml(origin: string = ""): string {
     });
 
     dom.resetBgBtn.addEventListener('click', () => {
-      setBackgroundColor('#ffffff');
+      setBackgroundColor('#ffffff', true);
     });
 
     // Quick color preset buttons
     document.querySelectorAll('.color-preset-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         const color = btn.getAttribute('data-color');
-        if (color) setBackgroundColor(color);
+        if (color) setBackgroundColor(color, true);
       });
     });
 
@@ -548,11 +679,18 @@ export function renderPlaygroundHtml(origin: string = ""): string {
 
     dom.renderBtn.addEventListener('click', executeRender);
 
-    // Copy URL
+    // Copy Page URL (Playground URL with full query parameters)
+    dom.copyPageUrlBtn.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(window.location.href);
+      dom.copyPageUrlBtn.textContent = 'Copied! ✓';
+      setTimeout(() => (dom.copyPageUrlBtn.textContent = 'Copy Page Link'), 1500);
+    });
+
+    // Copy Raw API URL
     dom.copyUrlBtn.addEventListener('click', async () => {
       await navigator.clipboard.writeText(dom.requestUrlInput.value);
       dom.copyUrlBtn.textContent = 'Copied! ✓';
-      setTimeout(() => (dom.copyUrlBtn.textContent = 'Copy URL'), 1500);
+      setTimeout(() => (dom.copyUrlBtn.textContent = 'Copy Raw URL'), 1500);
     });
 
     // Copy cURL
@@ -578,10 +716,17 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       window.location.href = \`/?\${params.toString()}\`;
     });
 
-    // Initialize
-    loadPreset(dom.presetSelect.value);
+    // Respond to browser back/forward buttons
+    window.addEventListener('popstate', () => {
+      loadStateFromUrl();
+      executeRender();
+    });
+
+    // Initialize from URL query parameters
+    loadStateFromUrl();
     updatePreviewBackground();
     updateUrlDisplay();
+    syncAddressBarUrl();
     executeRender();
   </script>
 </body>

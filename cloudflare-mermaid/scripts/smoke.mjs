@@ -161,6 +161,11 @@ async function main() {
     if (!playgroundHtml.includes(`og:image`)) throw new Error(`expected og:image meta tag in playground HTML`);
     if (!playgroundHtml.includes(`twitter:image`)) throw new Error(`expected twitter:image meta tag in playground HTML`);
 
+    // 5b) Test GET /playground with query parameters -> returns HTML
+    console.log("[smoke] Test 5b: GET /playground?preset=sequence-auth&theme=dark");
+    const parameterizedPlaygroundRes = await fetch(`http://127.0.0.1:${port}/playground?preset=sequence-auth&theme=dark`);
+    if (parameterizedPlaygroundRes.status !== 200) throw new Error(`expected 200 for parameterized playground, got ${parameterizedPlaygroundRes.status}`);
+
     // 6) Test GET /api/presets -> returns JSON array
     console.log("[smoke] Test 6: GET /api/presets");
     const presetsRes = await fetch(`http://127.0.0.1:${port}/api/presets`);
