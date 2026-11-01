@@ -28,20 +28,21 @@ Headless Chrome や Puppeteer を使わず、WASM ベースのレンダリング
 | `subtitle` | string | `subtitle` | サブタイトル |
 | `image` | string | (バンドルされたローカル画像) | 右上カードに表示する画像 URL または Data URL |
 | `mermaid` | string | (サンプルアーキテクチャ図) | Mermaid ソースコード（URL エンコード） |
+| `vertical` | string | `超高速エッジ生成` | 中央に配置される縦書きピルバッジのテキスト（`none` で非表示） |
 
 ### レンダリング例
 
 ```
 +---------------------------------------------------------------+
 |  -- FEATURED CONTENT               +-----------------------+  |
-|                                    |                       |  |
-|  Title                             |      Cover Photo      |  |
-|                                    |   (1:1 Square Image)  |  |
-|  subtitle                          +------------+----------+  |
-|                                    | ● ● ● mmd  | Mermaid  |  |
-|                                    |-----------------------|  |
-|  [satoru-cloudflare-ogp]           | Client -> Worker->... |  |
-|                                    +-----------------------+  |
+|                         [超]       |                       |  |
+|  Title                  [高]       |      Cover Photo      |  |
+|                         [速]       |   (1:1 Square Image)  |  |
+|  subtitle               [エ]       +------------+----------+  |
+|                         [ッ]       | ● ● ● mmd  | Mermaid  |  |
+|                         [ジ]       |-----------------------|  |
+|  [satoru-cloudflare-ogp][生]       | Client -> Worker->... |  |
+|                         [成]       +-----------------------+  |
 +---------------------------------------------------------------+
 ```
 

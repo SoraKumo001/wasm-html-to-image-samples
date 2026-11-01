@@ -17,7 +17,10 @@ const DEFAULT_IMAGE = `data:image/jpeg;base64,${toBase64(defaultImageBuffer)}`;
 const DEFAULT_MERMAID = `graph LR
   Client[Client 🌐] --> Worker[Worker ⚡]
   Worker --> WASM[WASM 🦀]
-  WASM --> Image[OGP 🎨]`;
+  WASM --> Image[OGP 🎨]
+  classDef default fill:#1e1e2e,stroke:#818cf8,stroke-width:1.5px,color:#cdd6f4`;
+
+const DEFAULT_VERTICAL = "縦書きは出来て当たり前";
 
 const app = new Hono();
 
@@ -26,6 +29,7 @@ app.get("/", async (c) => {
   const title = c.req.query("title") ?? "Title";
   const image = c.req.query("image") ?? DEFAULT_IMAGE;
   const mermaidSource = c.req.query("mermaid") ?? DEFAULT_MERMAID;
+  const verticalText = c.req.query("vertical") ?? DEFAULT_VERTICAL;
 
   const cache = await caches.open("satoru-cloudflare-ogp");
   const cacheKey = new Request(c.req.url);
@@ -54,6 +58,13 @@ app.get("/", async (c) => {
             height: auto !important;
             max-height: 100% !important;
           }
+          .vertical-pill {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            white-space: nowrap;
+            letter-spacing: 0.35em;
+            font-family: 'Noto Sans JP', sans-serif;
+          }
         `}</style>
       </head>
       <body className="m-0 p-0">
@@ -63,7 +74,7 @@ app.get("/", async (c) => {
           <div className="absolute bottom-[-100px] left-[-50px] w-[400px] h-[400px] rounded-[200px] bg-[radial-gradient(circle,_rgba(168,85,247,0.2)_0%,_rgba(168,85,247,0)_70%)] flex" />
 
           {/* Left Column: Typography & Info */}
-          <div className="flex flex-col w-[540px] h-full p-[60px] justify-between z-10">
+          <div className="flex flex-col w-[530px] h-full p-[60px] justify-between z-10">
             <div className="flex flex-col">
               <div className="flex items-center mb-6">
                 <div className="w-10 h-1 bg-[#6366f1] mr-[15px] rounded-sm" />
@@ -89,6 +100,18 @@ app.get("/", async (c) => {
             </div>
           </div>
 
+          {/* Vertical Text Accent Pill (Floating between columns) */}
+          {verticalText && verticalText !== "none" ? (
+            <div className="absolute top-[60px] left-[570px] z-20 flex">
+              <div
+                className="vertical-pill text-[13px] font-bold text-[#c7d2fe] bg-[#141424]/90 border border-[#818cf8]/40 shadow-[0_10px_25px_rgba(0,0,0,0.6)] backdrop-blur-md"
+                style={{ padding: "28px 10px", borderRadius: "24px" }}
+              >
+                {verticalText}
+              </div>
+            </div>
+          ) : null}
+
           {/* Right Column: Layered 1:1 Image + Overlapping Mermaid Window */}
           <div className="relative flex-1 h-full z-10">
             {/* Decorative angled backdrop for the image card */}
@@ -108,7 +131,7 @@ app.get("/", async (c) => {
                   <span className="w-3 h-3 rounded-full bg-[#eab308] inline-block" />
                   <span className="w-3 h-3 rounded-full bg-[#22c55e] inline-block" />
                   <span className="text-xs text-white/50 ml-2 font-mono">
-                    architecture.mmd
+                    Mermaidも全種類出力可能
                   </span>
                 </div>
                 <span className="text-[11px] text-[#818cf8] font-mono px-2 py-0.5 rounded bg-[#6366f1]/10 border border-[#6366f1]/20">
