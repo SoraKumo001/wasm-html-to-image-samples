@@ -148,17 +148,12 @@ app.get("/favicon.svg", (c) =>
   }),
 );
 
-app.get("/og-image.png", (c) => handleOgpPng(c));
 app.get("/og.png", (c) => handleOgpPng(c));
 
-// --- Playground endpoints ---
-app.get("/playground", (c) => {
-  const origin = new URL(c.req.url).origin;
-  return c.html(renderPlaygroundHtml(origin));
-});
+// --- Playground endpoint (UI) ---
 app.get("/ui", (c) => {
-  const origin = new URL(c.req.url).origin;
-  return c.html(renderPlaygroundHtml(origin));
+  const url = new URL(c.req.url);
+  return c.html(renderPlaygroundHtml(url.origin, url.search));
 });
 
 // --- API: Presets list ---

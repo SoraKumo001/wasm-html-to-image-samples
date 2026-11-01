@@ -1,7 +1,8 @@
 import { PRESETS } from "./presets.js";
 import { MERMAID_THEMES } from "wasm-html-to-image";
 
-export function renderPlaygroundHtml(origin: string = ""): string {
+export function renderPlaygroundHtml(origin: string = "", search: string = ""): string {
+  const ogImageUrl = `${origin}/og.png${search}`;
   const themeOptions = Object.keys(MERMAID_THEMES)
     .map((theme) => `<option value="${theme}" ${theme === "light" ? "selected" : ""}>${theme}</option>`)
     .join("");
@@ -37,12 +38,12 @@ export function renderPlaygroundHtml(origin: string = ""): string {
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="${origin}/playground">
+  <meta property="og:url" content="${origin}/ui${search}">
   <meta property="og:site_name" content="Cloudflare Mermaid">
   <meta property="og:title" content="Cloudflare Mermaid Playground ⚡ - WASM Powered Microservice">
   <meta property="og:description" content="Cloudflare Workers WASM エンジンによる超高速 Mermaid レンダリングマイクロサービス。SVG/WebP/PNG/JPEG 変換や各種テーマ、構文修復、パラメータ調整をリアルタイムに試せるプレイグラウンド。">
-  <meta property="og:image" content="${origin}/og-image.png">
-  <meta property="og:image:secure_url" content="${origin}/og-image.png">
+  <meta property="og:image" content="${ogImageUrl}">
+  <meta property="og:image:secure_url" content="${ogImageUrl}">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -50,10 +51,10 @@ export function renderPlaygroundHtml(origin: string = ""): string {
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="${origin}/playground">
+  <meta name="twitter:url" content="${origin}/ui${search}">
   <meta name="twitter:title" content="Cloudflare Mermaid Playground ⚡ - WASM Powered Microservice">
   <meta name="twitter:description" content="Cloudflare Workers WASM エンジンによる超高速 Mermaid レンダリングマイクロサービス。SVG/WebP/PNG/JPEG 変換や各種テーマ、構文修復、パラメータ調整をリアルタイムに試せるプレイグラウンド。">
-  <meta name="twitter:image" content="${origin}/og-image.png">
+  <meta name="twitter:image" content="${ogImageUrl}">
   <meta name="twitter:image:alt" content="Cloudflare Mermaid Playground - Zero-DOM WASM diagram renderer preview">
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -75,12 +76,25 @@ export function renderPlaygroundHtml(origin: string = ""): string {
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #475569; }
-    #svgContainer svg {
+    
+    #diagramCard {
+      transition: background-color 0.2s, box-shadow 0.2s;
+    }
+    #svgContainer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       max-width: 100%;
-      height: auto;
-      max-height: 70vh;
+      max-height: calc(100vh - 160px);
+    }
+    #svgContainer svg {
       display: block;
       margin: auto;
+      max-width: 100%;
+      max-height: calc(100vh - 160px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
     }
     .checkered-pattern {
       background-color: #0f172a;
@@ -275,13 +289,16 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       </div>
 
       <!-- Preview Canvas Area -->
-      <div id="canvasWrapper" class="flex-1 relative overflow-auto p-4 flex items-center justify-center min-h-[320px] checkered-pattern transition-colors">
-        <!-- SVG container -->
-        <div id="svgContainer" class="w-full h-full flex items-center justify-center p-2 rounded transition-colors"></div>
-        <!-- Raster Image Preview -->
-        <img id="rasterPreview" class="hidden max-w-full max-h-[70vh] object-contain shadow-2xl rounded p-2 transition-colors" alt="Diagram preview" />
+      <div id="canvasWrapper" class="flex-1 relative overflow-auto p-6 flex flex-col min-h-0 checkered-pattern transition-colors">
+        <!-- Diagram Card Box (Centrally aligned, never clipped) -->
+        <div id="diagramCard" class="m-auto max-w-full flex items-center justify-center p-6 rounded-xl shadow-2xl transition-all border border-slate-800">
+          <!-- SVG container -->
+          <div id="svgContainer" class="flex items-center justify-center max-w-full"></div>
+          <!-- Raster Image Preview -->
+          <img id="rasterPreview" class="hidden max-w-full max-h-[72vh] object-contain rounded" alt="Diagram preview" />
+        </div>
         <!-- Error box -->
-        <div id="errorAlert" class="hidden max-w-lg p-4 rounded-lg bg-red-950/80 border border-red-800 text-red-200 text-xs shadow-xl">
+        <div id="errorAlert" class="hidden m-auto max-w-lg p-4 rounded-lg bg-red-950/80 border border-red-800 text-red-200 text-xs shadow-xl">
           <div class="font-bold mb-1 flex items-center gap-1.5 text-red-400">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Render Error
@@ -336,6 +353,7 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       renderBtnText: document.getElementById('renderBtnText'),
       spinner: document.getElementById('spinner'),
       canvasWrapper: document.getElementById('canvasWrapper'),
+      diagramCard: document.getElementById('diagramCard'),
       svgContainer: document.getElementById('svgContainer'),
       rasterPreview: document.getElementById('rasterPreview'),
       errorAlert: document.getElementById('errorAlert'),
@@ -392,12 +410,17 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       const bg = dom.bgInput.value.trim().toLowerCase();
       if (!bg || bg === 'transparent') {
         dom.canvasWrapper.classList.add('checkered-pattern');
-        dom.svgContainer.style.backgroundColor = 'transparent';
+        dom.canvasWrapper.style.backgroundColor = '';
+        dom.diagramCard.style.backgroundColor = 'transparent';
+        dom.diagramCard.classList.remove('shadow-2xl', 'border-slate-800');
+        dom.diagramCard.classList.add('border-dashed', 'border-slate-800');
         dom.rasterPreview.style.backgroundColor = 'transparent';
       } else {
         dom.canvasWrapper.classList.remove('checkered-pattern');
         dom.canvasWrapper.style.backgroundColor = '#0b0f19';
-        dom.svgContainer.style.backgroundColor = bg;
+        dom.diagramCard.style.backgroundColor = bg;
+        dom.diagramCard.classList.remove('border-dashed');
+        dom.diagramCard.classList.add('shadow-2xl', 'border-slate-800');
         dom.rasterPreview.style.backgroundColor = bg;
       }
     }
@@ -464,6 +487,14 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       const queryString = params.toString();
       const newPath = queryString ? \`\${window.location.pathname}?\${queryString}\` : window.location.pathname;
       window.history.replaceState(null, '', newPath);
+
+      // Dynamically update OGP image meta tags to match current parameters
+      const origin = window.location.origin;
+      const ogUrl = queryString ? \`\${origin}/og.png?\${queryString}\` : \`\${origin}/og.png\`;
+      const metaOgImage = document.querySelector('meta[property="og:image"]');
+      const metaTwitterImage = document.querySelector('meta[name="twitter:image"]');
+      if (metaOgImage) metaOgImage.setAttribute('content', ogUrl);
+      if (metaTwitterImage) metaTwitterImage.setAttribute('content', ogUrl);
     }
 
     // Read state from URL on initial load or popstate (falls back to localStorage)
@@ -545,6 +576,34 @@ export function renderPlaygroundHtml(origin: string = ""): string {
       dom.requestUrlInput.value = fullUrl;
     }
 
+    function normalizeSvg(svg) {
+      if (!svg || typeof svg !== 'string') return svg;
+      return svg.replace(/<svg\b([^>]*?)>/i, (_match, attrs) => {
+        let newAttrs = attrs;
+        const widthMatch = newAttrs.match(/\\bwidth=["']?([\\d.]+)(?:px)?["']?/i);
+        const heightMatch = newAttrs.match(/\\bheight=["']?([\\d.]+)(?:px)?["']?/i);
+        const hasViewBox = /\\bviewBox=/i.test(newAttrs);
+        let vb = '';
+        if (!hasViewBox && widthMatch && heightMatch) {
+          vb = \`viewBox="0 \${widthMatch[1]} \${heightMatch[1]}"\`;
+        }
+        newAttrs = newAttrs.replace(/\\bstyle="([^"]*)"/i, (_, styleContent) => {
+          const cleaned = styleContent
+            .replace(/max-width:\\s*[^;]+;?/gi, '')
+            .replace(/width:\\s*[^;]+;?/gi, '')
+            .trim();
+          return cleaned ? \`style="\${cleaned}"\` : '';
+        });
+        if (!/\\bpreserveAspectRatio=/i.test(newAttrs)) {
+          newAttrs += ' preserveAspectRatio="xMidYMid meet"';
+        }
+        if (vb) {
+          newAttrs += \` \${vb}\`;
+        }
+        return \`<svg \${newAttrs}>\`;
+      });
+    }
+
     async function executeRender() {
       const code = dom.codeInput.value.trim();
       const format = dom.formatSelect.value;
@@ -588,7 +647,8 @@ export function renderPlaygroundHtml(origin: string = ""): string {
         }
 
         if (format === 'svg') {
-          const svgText = await blob.text();
+          const rawSvgText = await blob.text();
+          const svgText = normalizeSvg(rawSvgText);
           dom.rasterPreview.classList.add('hidden');
           dom.svgContainer.classList.remove('hidden');
           dom.svgContainer.innerHTML = svgText;

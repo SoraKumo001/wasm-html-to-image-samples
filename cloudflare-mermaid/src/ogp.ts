@@ -1,5 +1,6 @@
 import type { Context } from "hono";
-import { render } from "wasm-html-to-image";
+import { render, MERMAID_THEMES, type MermaidTheme } from "wasm-html-to-image";
+import { PRESETS } from "./presets.js";
 
 export function generateFaviconSvg(): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
@@ -20,7 +21,48 @@ export function generateFaviconSvg(): string {
 </svg>`;
 }
 
-export function generateOgpHtml(): string {
+function makeSvgResponsive(svg: string): string {
+  // Find the root <svg ...> tag
+  const rootTagMatch = svg.match(/<svg\b([^>]*)>/i);
+  if (!rootTagMatch) return svg;
+
+  let rootAttrs = rootTagMatch[1];
+  const hasViewBox = /\bviewBox\s*=/i.test(rootAttrs);
+
+  if (!hasViewBox) {
+    const widthMatch = rootAttrs.match(/\bwidth\s*=\s*["']?([\d.]+)(?:px)?["']?/i);
+    const heightMatch = rootAttrs.match(/\bheight\s*=\s*["']?([\d.]+)(?:px)?["']?/i);
+    if (widthMatch && heightMatch) {
+      const w = widthMatch[1];
+      const h = heightMatch[1];
+      rootAttrs += ` viewBox="0 0 ${w} ${h}"`;
+    }
+  }
+
+  // Ensure preserveAspectRatio="xMidYMid meet" so the entire diagram scales without distortion
+  if (!/\bpreserveAspectRatio\s*=/i.test(rootAttrs)) {
+    rootAttrs += ' preserveAspectRatio="xMidYMid meet"';
+  }
+
+  // Set width and height to 100% on the root <svg> tag so it smoothly scales inside the container
+  rootAttrs = rootAttrs
+    .replace(/\bwidth\s*=\s*["']?[^"'\s>]+["']?/gi, 'width="100%"')
+    .replace(/\bheight\s*=\s*["']?[^"'\s>]+["']?/gi, 'height="100%"');
+
+  return svg.replace(rootTagMatch[0], `<svg ${rootAttrs}>`);
+}
+
+export function generateOgpHtml(options: {
+  diagramSvg: string;
+  presetName: string;
+  theme: string;
+  mode: string;
+  bg: string;
+}): string {
+  const { diagramSvg, presetName, theme, mode, bg } = options;
+  const isDarkCanvas = bg === "#0f172a" || bg === "#1e293b" || bg === "dark";
+  const canvasBg = bg === "transparent" ? "transparent" : bg;
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -106,7 +148,7 @@ export function generateOgpHtml(): string {
     .left-col {
       position: relative;
       z-index: 10;
-      width: 550px;
+      width: 530px;
       display: flex;
       flex-direction: column;
     }
@@ -136,7 +178,7 @@ export function generateOgpHtml(): string {
     }
 
     .title {
-      font-size: 50px;
+      font-size: 48px;
       font-weight: 900;
       line-height: 1.1;
       letter-spacing: -1px;
@@ -155,31 +197,31 @@ export function generateOgpHtml(): string {
     }
 
     .desc {
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1.5;
       color: #cbd5e1;
-      margin: 0 0 28px 0;
+      margin: 0 0 24px 0;
     }
 
     .features-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 24px;
+      gap: 10px;
+      margin-bottom: 22px;
     }
     .feature-card {
       background: #0f172a;
       border: 1px solid #334155;
       border-radius: 10px;
-      padding: 10px 14px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
     .feature-icon {
-      font-size: 16px;
-      width: 28px;
-      height: 28px;
+      font-size: 15px;
+      width: 26px;
+      height: 26px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -187,12 +229,12 @@ export function generateOgpHtml(): string {
       border-radius: 50%;
     }
     .feature-title {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: #f8fafc;
     }
     .feature-sub {
-      font-size: 11px;
+      font-size: 10px;
       color: #94a3b8;
       font-family: ui-monospace, Menlo, Monaco, monospace;
     }
@@ -208,13 +250,14 @@ export function generateOgpHtml(): string {
     .right-col {
       position: relative;
       z-index: 10;
-      width: 480px;
+      width: 510px;
       display: flex;
       justify-content: center;
     }
 
     .window-card {
-      width: 480px;
+      width: 510px;
+      height: 480px;
       background: #1e293b;
       border: 1.5px solid #334155;
       border-radius: 16px;
@@ -231,6 +274,7 @@ export function generateOgpHtml(): string {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      shrink: 0;
     }
     .window-dots {
       display: flex;
@@ -250,133 +294,95 @@ export function generateOgpHtml(): string {
       font-family: ui-monospace, Menlo, Monaco, monospace;
       color: #94a3b8;
       font-weight: 600;
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .window-badges {
+      display: flex;
+      gap: 6px;
+    }
+    .meta-tag {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #334155;
+      font-family: ui-monospace, monospace;
+      font-weight: bold;
     }
 
     .diagram-body {
-      background: #ffffff;
-      padding: 24px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 18px;
-    }
-
-    .diagram-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: #0f172a;
-      text-align: center;
-    }
-
-    .flow-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-    }
-
-    .node {
-      padding: 8px 14px;
-      border-radius: 8px;
-      text-align: center;
+      flex: 1;
+      min-height: 0;
+      background-color: ${canvasBg};
+      padding: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-    }
-    .node-client {
-      background: #1e293b;
-      border: 1.5px solid #475569;
-      color: #ffffff;
-    }
-    .node-worker {
-      background: #0ea5e9;
-      border: 2px solid #38bdf8;
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
-    }
-    .node-output {
-      background: #10b981;
-      border: 1.5px solid #34d399;
-      color: #ffffff;
-    }
-
-    .node-main { font-size: 12px; font-weight: 700; }
-    .node-sub { font-size: 9px; opacity: 0.85; font-family: ui-monospace, monospace; }
-
-    .arrow {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: #0284c7;
-      font-size: 9px;
-      font-weight: 700;
-      font-family: ui-monospace, monospace;
-    }
-    .arrow-line {
-      width: 28px;
-      height: 2px;
-      background: #0ea5e9;
+      overflow: hidden;
       position: relative;
     }
-    .arrow-line::after {
-      content: '';
-      position: absolute;
-      right: 0;
-      top: -3px;
-      border-top: 4px solid transparent;
-      border-bottom: 4px solid transparent;
-      border-left: 6px solid #0ea5e9;
-    }
 
-    .formats-box {
+    .diagram-container {
       width: 100%;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 10px 14px;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
       display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .formats-title {
-      font-size: 10px;
-      font-weight: 700;
-      color: #475569;
-    }
-    .pills-row {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .pill {
-      font-size: 9px;
-      font-weight: 700;
-      font-family: ui-monospace, monospace;
-      color: #ffffff;
-      padding: 3px 8px;
-      border-radius: 4px;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
 
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 14px;
-      border-radius: 12px;
-      background: #ecfdf5;
-      border: 1px solid #10b981;
-      font-size: 10px;
-      font-weight: 700;
-      color: #065f46;
-      font-family: ui-monospace, monospace;
+    .diagram-container svg {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      display: block !important;
+      margin: auto !important;
+      object-fit: contain !important;
     }
-    .status-dot {
+
+    /* Checkered pattern when background is transparent */
+    .checkered-pattern {
+      background-color: #0f172a;
+      background-image: linear-gradient(45deg, #1e293b 25%, transparent 25%),
+                        linear-gradient(-45deg, #1e293b 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #1e293b 75%),
+                        linear-gradient(-45deg, transparent 75%, #1e293b 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    }
+
+    .window-footer {
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      font-family: ui-monospace, monospace;
+      color: #94a3b8;
+    }
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #10b981;
+      font-weight: bold;
+    }
+    .live-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
       background: #10b981;
+      box-shadow: 0 0 6px #10b981;
     }
   </style>
 </head>
@@ -437,11 +443,11 @@ export function generateOgpHtml(): string {
       </div>
 
       <div class="footer-url">
-        ENDPOINT: <span>/playground</span> | <span>GET /?format=webp</span>
+        ENDPOINT: <span>/ui</span> | <span>GET /?format=webp</span>
       </div>
     </div>
 
-    <!-- Right Column: Card Preview -->
+    <!-- Right Column: Card Preview with Rendered Diagram -->
     <div class="right-col">
       <div class="window-card">
         <div class="window-header">
@@ -450,56 +456,25 @@ export function generateOgpHtml(): string {
             <div class="dot dot-yellow"></div>
             <div class="dot dot-green"></div>
           </div>
-          <div class="window-filename">cloudflare-mermaid-flow.svg</div>
-          <div style="width: 42px;"></div>
+          <div class="window-filename">${presetName}.svg</div>
+          <div class="window-badges">
+            <span class="meta-tag">${theme}</span>
+            <span class="meta-tag">${mode}</span>
+          </div>
         </div>
 
-        <div class="diagram-body">
-          <div class="diagram-title">Cloudflare Edge Mermaid Pipeline</div>
-
-          <div class="flow-row">
-            <div class="node node-client">
-              <div class="node-main">Client 💻</div>
-              <div class="node-sub">HTTP Request</div>
-            </div>
-
-            <div class="arrow">
-              <span>GET/POST</span>
-              <div class="arrow-line"></div>
-            </div>
-
-            <div class="node node-worker">
-              <div class="node-main">Worker ⚡</div>
-              <div class="node-sub">Hono + WASM</div>
-            </div>
-
-            <div class="arrow">
-              <span>Render</span>
-              <div class="arrow-line"></div>
-            </div>
-
-            <div class="node node-output">
-              <div class="node-main">Output 🎨</div>
-              <div class="node-sub">SVG / WebP</div>
-            </div>
+        <div class="diagram-body ${bg === "transparent" ? "checkered-pattern" : ""}">
+          <div class="diagram-container">
+            ${diagramSvg}
           </div>
+        </div>
 
-          <div class="formats-box">
-            <div class="formats-title">Supported Formats &amp; Features:</div>
-            <div class="pills-row">
-              <span class="pill" style="background: #0284c7;">SVG</span>
-              <span class="pill" style="background: #6366f1;">WebP</span>
-              <span class="pill" style="background: #10b981;">PNG</span>
-              <span class="pill" style="background: #f59e0b;">JPEG</span>
-              <span class="pill" style="background: #475569;">10 Themes</span>
-              <span class="pill" style="background: #0d9488;">Auto-Fix Mode</span>
-            </div>
+        <div class="window-footer">
+          <div class="live-badge">
+            <div class="live-dot"></div>
+            LIVE WASM RENDER
           </div>
-
-          <div class="status-badge">
-            <div class="status-dot"></div>
-            STATUS: 200 OK (8ms Edge)
-          </div>
+          <div>200 OK (Edge)</div>
         </div>
       </div>
     </div>
@@ -510,7 +485,7 @@ export function generateOgpHtml(): string {
 }
 
 export async function handleOgpPng(c: Context): Promise<Response> {
-  // Cache lookup
+  // Cache lookup based on the exact request URL (including search params)
   const cache = await caches.open("cloudflare-mermaid");
   const cacheKey = new Request(c.req.url, { method: "GET" });
   const cached = await cache.match(cacheKey);
@@ -518,7 +493,71 @@ export async function handleOgpPng(c: Context): Promise<Response> {
     return cached;
   }
 
-  const html = generateOgpHtml();
+  // Parse parameters
+  const url = new URL(c.req.url);
+  const presetId = url.searchParams.get("preset");
+  const matchedPreset = PRESETS.find((p) => p.id === presetId);
+
+  let code = url.searchParams.get("code") || url.searchParams.get("mermaid");
+  if (!code) {
+    code = matchedPreset ? matchedPreset.code : PRESETS[0].code;
+  }
+
+  const presetName = matchedPreset
+    ? matchedPreset.name
+    : (url.searchParams.get("title") || "diagram");
+  const themeParam = url.searchParams.get("theme") || "light";
+  const theme: MermaidTheme =
+    themeParam in MERMAID_THEMES ? (themeParam as MermaidTheme) : "light";
+  const mode = (url.searchParams.get("mode") ||
+    (matchedPreset?.recommendedMode ?? "strict")) as
+    | "strict"
+    | "compat"
+    | "recover";
+  const bg =
+    url.searchParams.get("bg") ||
+    url.searchParams.get("background") ||
+    "#ffffff";
+
+  // Step 1: Render the Mermaid diagram to SVG according to parameters
+  let diagramSvg = "";
+  try {
+    const result = await render({
+      mermaid: {
+        source: code,
+        theme,
+        mode,
+        background: bg === "transparent" ? undefined : bg,
+        padding: 16,
+        directives: true,
+      },
+      format: "svg",
+    });
+    diagramSvg =
+      typeof result.data === "string"
+        ? result.data
+        : new TextDecoder().decode(result.data as Uint8Array);
+    diagramSvg = makeSvgResponsive(diagramSvg);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const escaped = msg.replace(/[<>&]/g, (ch) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[ch] || ch);
+    diagramSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 140" width="450" height="140">
+      <rect width="450" height="140" rx="8" fill="#450a0a" stroke="#dc2626" stroke-width="2"/>
+      <text x="20" y="40" fill="#f87171" font-size="16" font-family="monospace" font-weight="bold">Mermaid Render Error</text>
+      <text x="20" y="75" fill="#fca5a5" font-size="12" font-family="monospace">${escaped.slice(0, 60)}</text>
+    </svg>`;
+  }
+
+  // Step 2: Generate the composite OGP HTML embedding the rendered diagram SVG
+  const html = generateOgpHtml({
+    diagramSvg,
+    presetName,
+    theme,
+    mode,
+    bg,
+  });
+
+  // Step 3: Render the composite HTML to 1200x630 PNG
   const result = await render({
     value: html,
     format: "png",
