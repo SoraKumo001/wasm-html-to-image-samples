@@ -4,5 +4,9 @@
   "private": true,
   "scripts": {
     "build": "pnpm -r build"
-  }
+  },
+  "main": "index.js",
+  "repository": "https://github.com/SoraKumo001/wasm-html-to-image-samples",
+  "author": "SoraKumo <info@croud.jp>",
+  "license": "MIT"
 }
