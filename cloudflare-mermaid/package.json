@@ -1,0 +1,21 @@
+{
+  "name": "cloudflare-mermaid",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "tsc",
+    "deploy": "wrangler deploy",
+    "test": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "wasm-html-to-image": "^1.0.36"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261101.1",
+    "@types/node": "26.6.6",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.156.0"
+  }
+}

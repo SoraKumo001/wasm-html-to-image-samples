@@ -28,7 +28,7 @@ pnpm -r build
 | [**`react-router-image-convert`**](./react-router-image-convert/) | Client-Side Image Converter | React Router v7             | Vite 7 + Tailwind CSS v4    | `wasm-html-to-image/workers`                                                                 |
 | [**`node-image-convert`**](./node-image-convert/)                 | CLI Batch Converter         | Node.js (ESM)               | TypeScript (`tsc -b`), tsx  | `wasm-html-to-image/single`<br>`wasm-html-to-image/workers`                                  |
 | [**`cloudflare-ogp`**](./cloudflare-ogp/)                         | Dynamic OGP Generator       | Cloudflare Workers (Preact) | Wrangler                    | `wasm-html-to-image/workerd`<br>`wasm-html-to-image/preact`<br>`wasm-html-to-image/tailwind` |
-                                                                   |
+| [**`cloudflare-mermaid`**](./cloudflare-mermaid/)                 | On-the-fly Mermaid API      | Cloudflare Workers (workerd)| Wrangler                    | `wasm-html-to-image/workerd`                                                                 |
 
 ---
 
@@ -161,14 +161,16 @@ Dynamic OGP image generation on Deno.
 
 ---
 
-### 8. [deno-image-optimization](./deno-image-optimization/)
+### 9. [cloudflare-mermaid](./cloudflare-mermaid/)
 
-On-demand image optimization and format conversion server on Deno.
+Ultra-lightweight on-the-fly Mermaid diagram renderer running on Cloudflare Workers. Converts Mermaid code to SVG, WebP, PNG, or JPEG directly via query parameters (`GET /?code=...&format=webp&theme=dark`).
 
-- **Runtime**: Deno 2+
-- **Build Tool**: Deno CLI
-- **Package Feature**: Simple HTTP proxy server using `Deno.serve` and `npm:wasm-html-to-image` to transcode and resize images on the fly.
+- **Runtime**: Cloudflare Workers (`workerd`)
+- **Build Tool**: Wrangler, TypeScript
+- **Package Feature**: Native WASM rendering via `wasm-html-to-image/workerd` with zero-DOM and built-in edge caching.
 - **Run**:
   ```bash
-  cd deno-image-optimization && deno run --allow-all src/index.ts
+  pnpm --filter cloudflare-mermaid dev
+  pnpm --filter cloudflare-mermaid test
   ```
+
