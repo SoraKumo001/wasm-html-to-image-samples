@@ -107,7 +107,7 @@ app.get("/", async (c) => {
           {verticalText && verticalText !== "none" ? (
             <div className="absolute top-[60px] left-[570px] z-20">
               <div
-                className="vertical-pill text-[13px] font-bold text-[#c7d2fe] bg-[#141424]/90 border border-[#818cf8]/40 shadow-[0_10px_25px_rgba(0,0,0,0.6)] backdrop-blur-md inline-block"
+                className="vertical-pill text-[13px] font-bold text-[#c7d2fe] backdrop-blur-xs border border-[#818cf8]/40 shadow-[0_10px_25px_rgba(0,0,0,0.6)] backdrop-blur-md inline-block"
                 style={{
                   height: "510px",
                   padding: "24px 12px",
@@ -131,7 +131,7 @@ app.get("/", async (c) => {
             </div>
 
             {/* Front Layer: Mermaid Architecture Window (Overlapping) */}
-            <div className="absolute bottom-[50px] right-[60px] w-[520px] h-[240px] rounded-[24px] overflow-hidden border border-white/20 bg-[#0f1017]/95 p-4 flex flex-col justify-between shadow-[0_25px_50px_rgba(0,0,0,0.8)]">
+            <div className="absolute bottom-[50px] right-[60px] w-[520px] h-[240px] rounded-[24px] overflow-hidden border border-white/20  p-4 flex flex-col justify-between shadow-[0_25px_50px_rgba(0,0,0,0.8)] back backdrop-blur-xs">
               {/* Window Titlebar */}
               <div className="flex items-center justify-between pb-2 border-b border-white/10">
                 <div className="flex items-center gap-2">
