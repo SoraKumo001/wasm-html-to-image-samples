@@ -14,13 +14,15 @@ function toBase64(buffer: ArrayBuffer): string {
 
 const DEFAULT_IMAGE = `data:image/jpeg;base64,${toBase64(defaultImageBuffer)}`;
 
-const DEFAULT_MERMAID = `graph LR
-  Client[Client 🌐] --> Worker[Worker ⚡]
-  Worker --> WASM[WASM 🦀]
-  WASM --> Image[OGP 🎨]
+const DEFAULT_MERMAID = `flowchart LR
+  Client([Client 🌐]) --> Worker[Worker ⚡]
+  Worker --> Cache{Cache?}
+  Cache -- Yes --> Image([OGP 🎨])
+  Cache -- No --> WASM[WASM 🦀] --> Image
   classDef default fill:#1e1e2e,stroke:#818cf8,stroke-width:1.5px,color:#cdd6f4`;
 
-const DEFAULT_VERTICAL = "縦書きは出来て当たり前";
+const DEFAULT_VERTICAL =
+  "縦書き上等！、縦書き上等！、縦書き上等！、縦書き上等！、縦書き上等！";
 
 const app = new Hono();
 
@@ -61,8 +63,9 @@ app.get("/", async (c) => {
           .vertical-pill {
             writing-mode: vertical-rl;
             text-orientation: upright;
-            white-space: nowrap;
             letter-spacing: 0.35em;
+            line-height: 1.8;
+            word-break: break-all;
             font-family: 'Noto Sans JP', sans-serif;
           }
         `}</style>
@@ -102,10 +105,15 @@ app.get("/", async (c) => {
 
           {/* Vertical Text Accent Pill (Floating between columns) */}
           {verticalText && verticalText !== "none" ? (
-            <div className="absolute top-[60px] left-[570px] z-20 flex">
+            <div className="absolute top-[60px] left-[570px] z-20">
               <div
-                className="vertical-pill text-[13px] font-bold text-[#c7d2fe] bg-[#141424]/90 border border-[#818cf8]/40 shadow-[0_10px_25px_rgba(0,0,0,0.6)] backdrop-blur-md"
-                style={{ padding: "28px 10px", borderRadius: "24px" }}
+                className="vertical-pill text-[13px] font-bold text-[#c7d2fe] bg-[#141424]/90 border border-[#818cf8]/40 shadow-[0_10px_25px_rgba(0,0,0,0.6)] backdrop-blur-md inline-block"
+                style={{
+                  height: "510px",
+                  padding: "24px 12px",
+                  borderRadius: "24px",
+                  boxSizing: "border-box",
+                }}
               >
                 {verticalText}
               </div>
