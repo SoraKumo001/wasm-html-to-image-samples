@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { render } from "wasm-html-to-image/workerd";
+import { render } from "wasm-html-to-image";
 import { createCSS } from "wasm-html-to-image/tailwind";
 import defaultImageBuffer from "../assets/image.jpg";
 
