@@ -57,22 +57,22 @@ export function createTiltEffect(): EffectHandle {
     return { ctx, cssWidth, cssHeight };
   };
 
-  const frame = (now: number) => {
-    if (!running) return;
-
+  const drawFrame = (now: number) => {
     // Live mode: repaint the drawable canvas from the DOM before reading it.
     source?.refresh?.();
     const view = syncCanvas();
 
     if (!view || !source || source.width === 0 || source.height === 0) {
-      // Source not ready: keep the loop alive so a later start() is the only
-      // thing that needs to supply new pixels.
-      raf = requestAnimationFrame(frame);
+      // Source not ready: skip this frame. The outer loop keeps running so a
+      // later start() only has to supply new pixels.
       return;
     }
 
     const { ctx, cssWidth: w, cssHeight: h } = view;
-    const elapsed = (now - startTime) / 1000;
+    // Firefox hands a rAF callback the frame-start timestamp, which can be
+    // earlier than the performance.now() captured by start(). Clamp so time
+    // based maths never goes backwards on the first frame after a restart.
+    const elapsed = Math.max(0, now - startTime) / 1000;
 
     // Gentle idle drift until the pointer takes over.
     if (!hasPointer) {
@@ -150,8 +150,21 @@ export function createTiltEffect(): EffectHandle {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, w, h);
     ctx.restore();
+  };
 
-    raf = requestAnimationFrame(frame);
+  /**
+   * Loop wrapper. A throw inside a frame (a closed bitmap, a rejected canvas
+   * call) must never end the loop: in Firefox a thrown rAF callback is simply
+   * dropped, leaving a frozen canvas until the effect is re-created.
+   */
+  const frame = (now: number) => {
+    if (!running) return;
+    try {
+      drawFrame(now);
+    } catch (error) {
+      console.error("[tilt] frame failed", error);
+    }
+    if (running) raf = requestAnimationFrame(frame);
   };
 
   const stopLoop = () => {

@@ -165,6 +165,7 @@ export function App() {
 
       setSourceVersion((version) => version + 1);
     } catch (cause) {
+      console.error("[canvas-image-effects] render failed", cause);
       if (seq === renderSeq.current) {
         setError(cause instanceof Error ? cause.message : String(cause));
       }
@@ -219,20 +220,44 @@ export function App() {
       };
     } else {
       bitmap = bitmapRef.current;
+      // No bitmap yet: normal before the first snapshot render resolves.
       if (!bitmap) return;
+      // A closed ImageBitmap reports zero dimensions; starting a loop on one
+      // would animate forever without drawing, so bail with a visible reason.
+      if (bitmap.width === 0 || bitmap.height === 0) {
+        console.error(
+          "[canvas-image-effects] closed bitmap handed to the effect",
+          bitmap,
+        );
+        return;
+      }
       source = { image: bitmap, width: bitmap.width, height: bitmap.height };
     }
 
     const handle = EFFECT_FACTORIES[effectKind]();
     effectRef.current = handle;
-    handle.start(canvas, source);
+    let started = false;
+    try {
+      handle.start(canvas, source);
+      started = true;
+    } catch (cause) {
+      // A failed start must not leave a half-attached handle around: clear it
+      // so the next render/effect change can retry cleanly. Firefox only
+      // reports these as unhandled draw errors, so log explicitly.
+      console.error("[canvas-image-effects] effect start failed", cause);
+      handle.stop();
+      if (effectRef.current === handle) effectRef.current = null;
+    }
 
-    // Carry the last pointer position over to the fresh handle, so a re-render
-    // does not snap the effect back to its neutral/idle pose.
-    const pointer = pointerRef.current;
-    if (pointer) handle.setPointer(pointer.x, pointer.y);
+    if (started) {
+      // Carry the last pointer position over to the fresh handle, so a
+      // re-render does not snap the effect back to its neutral/idle pose.
+      const pointer = pointerRef.current;
+      if (pointer) handle.setPointer(pointer.x, pointer.y);
+    }
 
     return () => {
+      // stop() is idempotent, so teardown is safe even after a failed start.
       handle.stop();
       if (effectRef.current === handle) effectRef.current = null;
 

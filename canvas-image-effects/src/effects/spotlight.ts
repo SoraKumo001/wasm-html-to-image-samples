@@ -15,6 +15,26 @@ const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
+/**
+ * `ctx.filter` is not implemented everywhere, and assigning it can be silently
+ * ignored. Probe once and remember the answer so the base layer degrades to a
+ * sharp copy instead of an unblurred `none`.
+ */
+let filterSupport: boolean | null = null;
+
+const supportsFilter = (ctx: CanvasRenderingContext2D): boolean => {
+  if (filterSupport !== null) return filterSupport;
+  try {
+    const previous = ctx.filter;
+    ctx.filter = "blur(1px)";
+    filterSupport = ctx.filter === "blur(1px)";
+    ctx.filter = previous;
+  } catch {
+    filterSupport = false;
+  }
+  return filterSupport;
+};
+
 type Frame = {
   ctx: CanvasRenderingContext2D;
   cssWidth: number;
@@ -51,14 +71,27 @@ export function createSpotlightEffect(): EffectHandle {
     copy.width = current.width;
     copy.height = current.height;
     const ctx = copy.getContext("2d");
-    if (ctx) {
-      if ("filter" in ctx) {
+    if (!ctx) return copy;
+
+    const blur = `blur(${Math.max(6, Math.round(current.width * 0.008))}px)`;
+    if (supportsFilter(ctx)) {
+      try {
         // Blur in bitmap space, so the softness is resolution-independent.
-        ctx.filter = `blur(${Math.max(6, Math.round(current.width * 0.008))}px)`;
+        ctx.filter = blur;
+        ctx.drawImage(current.image, 0, 0);
+        ctx.filter = "none";
+        return copy;
+      } catch (error) {
+        ctx.filter = "none";
+        console.error(
+          "[spotlight] canvas filter failed; using an unblurred base",
+          error,
+        );
       }
-      ctx.drawImage(current.image, 0, 0);
-      if ("filter" in ctx) ctx.filter = "none";
     }
+
+    // No usable `ctx.filter`: fall back to a sharp base rather than failing.
+    ctx.drawImage(current.image, 0, 0);
     return copy;
   };
 
@@ -87,9 +120,7 @@ export function createSpotlightEffect(): EffectHandle {
     return { ctx, cssWidth, cssHeight, dpr };
   };
 
-  const frame = (now: number) => {
-    if (!running) return;
-
+  const drawFrame = (now: number) => {
     // Live mode: repaint the drawable canvas from the DOM before reading it.
     source?.refresh?.();
     const view = syncCanvas();
@@ -103,14 +134,16 @@ export function createSpotlightEffect(): EffectHandle {
       !layerCtx ||
       !blurred
     ) {
-      // Missing pixels or resources: keep the loop alive so a later start()
-      // simply swaps in the new bitmap.
-      raf = requestAnimationFrame(frame);
+      // Missing pixels or resources: skip this frame. The loop keeps running so
+      // a later start() simply swaps in the new bitmap.
       return;
     }
 
     const { ctx, cssWidth: w, cssHeight: h, dpr } = view;
-    const elapsed = now - startTime;
+    // Firefox can hand a rAF callback a timestamp older than the
+    // performance.now() captured in start(). A negative elapsed time used to
+    // produce a negative gradient radius, which throws and kills the loop.
+    const elapsed = Math.max(0, now - startTime);
 
     if (!pointerReady) {
       if (hasTarget) {
@@ -147,6 +180,9 @@ export function createSpotlightEffect(): EffectHandle {
     } else {
       radius = lensRadius;
     }
+    // Radial gradients reject a negative radius (Firefox throws, Chrome
+    // clamps), so never let time or easing push it below zero.
+    radius = Math.max(0, radius);
 
     // 1. Blurred base.
     ctx.clearRect(0, 0, w, h);
@@ -193,8 +229,21 @@ export function createSpotlightEffect(): EffectHandle {
     ctx.arc(cx, cy, radius * 1.15, 0, TAU);
     ctx.fill();
     ctx.restore();
+  };
 
-    raf = requestAnimationFrame(frame);
+  /**
+   * Loop wrapper. A throw inside a frame must not end the loop: Firefox drops
+   * the rejected rAF callback, so the canvas would stay frozen until the
+   * effect is re-created (which is what re-selecting the effect did).
+   */
+  const frame = (now: number) => {
+    if (!running) return;
+    try {
+      drawFrame(now);
+    } catch (error) {
+      console.error("[spotlight] frame failed", error);
+    }
+    if (running) raf = requestAnimationFrame(frame);
   };
 
   const stopLoop = () => {
