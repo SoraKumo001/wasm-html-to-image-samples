@@ -24,6 +24,7 @@ pnpm -r build
 | :---------------------------------------------------------------- | :-------------------------- | :-------------------------- | :-------------------------- | :------------------------------------------------------------------------------------------- |
 | [**`playground`**](./playground/)                                 | Interactive Web App         | Browser (React 19)          | Vite 8 + Tailwind CSS v4    | `wasm-html-to-image/workers`                                                                 |
 | [**`mermaid-compare`**](./mermaid-compare/)                       | Visual & Perf Comparison    | Browser (React 19)          | Vite 8 + Tailwind CSS v4    | `wasm-html-to-image/workers`                                                                 |
+| [**`canvas-image-effects`**](./canvas-image-effects/)             | Animated Canvas Effects     | Browser (React 19)          | Vite 8                      | `wasm-html-to-image/workers`                                                                 |
 | [**`next-image-convert`**](./next-image-convert/)                 | Client-Side Image Converter | Next.js 16 (App Router)     | Turbopack + Tailwind CSS v4 | `wasm-html-to-image/workers`                                                                 |
 | [**`react-router-image-convert`**](./react-router-image-convert/) | Client-Side Image Converter | React Router v7             | Vite 7 + Tailwind CSS v4    | `wasm-html-to-image/workers`                                                                 |
 | [**`node-image-convert`**](./node-image-convert/)                 | CLI Batch Converter         | Node.js (ESM)               | TypeScript (`tsc -b`), tsx  | `wasm-html-to-image/single`<br>`wasm-html-to-image/workers`                                  |
@@ -181,5 +182,24 @@ Ultra-lightweight on-the-fly Mermaid diagram renderer running on Cloudflare Work
   ```bash
   pnpm --filter cloudflare-mermaid dev
   pnpm --filter cloudflare-mermaid test
+  ```
+
+---
+
+### 10. [canvas-image-effects](./canvas-image-effects/)
+
+Render an HTML card on a plain 2D canvas: live DOM via `content="drawable"` when supported, PNG snapshot fallback otherwise.
+
+- **Runtime**: Browser SPA (React 19)
+- **Build Tool**: Vite 8, TypeScript
+- **Package Feature**:
+  - `src/renderImage.ts` calls `render()` from `wasm-html-to-image/workers` (PNG, `scale: 2`) and decodes the bytes into an `ImageBitmap` (snapshot fallback path).
+  - `src/effects/tilt.ts`: 2D parallax — the source is drawn as 24 horizontal strips, squashed and offset by virtual `rotateX` / `rotateY`, with a moving specular gradient (`globalCompositeOperation = "overlay"`) and a blurred drop shadow.
+  - `src/effects/spotlight.ts`: lens reveal — a pre-blurred copy sits underneath, while the sharp image is masked by a radial-gradient `destination-out` hole that expands on intro and then follows the pointer.
+  - Auto source mode: when Chrome exposes `content="drawable"` and `ctx.drawElementImage()`, a hidden drawable subtree repaints the live DOM each frame and the effects consume that canvas directly; otherwise the same effects consume the wasm-rendered `ImageBitmap`. A badge shows `LIVE DOM` vs `PNG snapshot`.
+- **Run**:
+  ```bash
+  pnpm --filter canvas-image-effects dev      # http://localhost:3002
+  pnpm --filter canvas-image-effects build
   ```
 
