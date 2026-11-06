@@ -202,4 +202,9 @@ Render an HTML card on a plain 2D canvas: live DOM via `content="drawable"` when
   pnpm --filter canvas-image-effects dev      # http://localhost:3002
   pnpm --filter canvas-image-effects build
   ```
+- **Deploy to Cloudflare**:
+  ```bash
+  # Cloudflare Workers (Static Assets)
+  pnpm --filter canvas-image-effects deploy
+  ```
 
