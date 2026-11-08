@@ -1,45 +1,45 @@
 # rivet-image-optimization
 
-[Rivet Actors](https://rivet.dev/) (RivetKit) 上で動作する画像最適化プロキシサービス。  
-[`cloudflare-image-optimization`](../cloudflare-image-optimization/) の機能を Rivet Actors のアーキテクチャに合わせて移植し、**WebAssembly による高速画像変換 (`wasm-html-to-image`)** と **Actor 内蔵の永続 SQLite キャッシュ** を組み合わせた実装です。
+An image optimization proxy service built on [Rivet Actors](https://rivet.dev/) (RivetKit).  
+Ported from [`cloudflare-image-optimization`](../cloudflare-image-optimization/) to fit the Rivet Actors architecture, combining **high-speed WebAssembly image conversion (`wasm-html-to-image`)** with **Actor-native persistent SQLite caching**.
 
 ---
 
-## 🌟 特徴
+## 🌟 Features
 
-- **WebAssembly 画像最適化**: [`wasm-html-to-image`](https://www.npmjs.com/package/wasm-html-to-image) の Universal WASM エンジンを採用し、AVIF, WebP, JPEG, PNG へのリサイズ・フォーマット変換を高速処理。
-- **Durable SQLite キャッシュ**: 各 Actor に自動プロビジョニングされる内蔵 SQLite データベース（`rivetkit/db`）を活用。外部キャッシュサーバー（Redis等）なしで、最適化済みバイナリを永続キャッシュ。
-- **Web 標準 `Request` / `Response` 対応**: RivetKit の `onRequest` フックにより、Cloudflare Workers や Next.js `next/image` のカスタムローダーとシームレスに連携。
-- **RPC Action 対応**: HTTP 経由だけでなく、Rivet クライアントからの型安全な RPC 呼び出し（`optimizer.optimize(...)`）もサポート。
-- **SVG / GIF パススルー**: ベクター画像やアニメーション GIF は不要な再エンコードを行わず、そのままキャッシュ＆返却。
+- **WebAssembly Image Optimization**: Uses the universal WebAssembly engine from [`wasm-html-to-image`](https://www.npmjs.com/package/wasm-html-to-image) to resize and convert formats (AVIF, WebP, JPEG, PNG) at high speed.
+- **Durable SQLite Cache**: Leverages each Actor's built-in SQLite database (`rivetkit/db`) to durably cache optimized image binaries without requiring external cache infrastructure (such as Redis).
+- **Web Standard `Request` / `Response` Support**: Seamlessly integrates with Next.js `next/image` custom loaders and Cloudflare Workers via RivetKit's `onRequest` hook.
+- **RPC Action Support**: Supports type-safe RPC invocations (`optimizer.optimize(...)`) from Rivet clients in addition to standard HTTP endpoints.
+- **SVG / GIF Passthrough**: Vector images (SVG) and animated GIFs are preserved and cached directly without unnecessary re-encoding.
 
 ---
 
-## 🚀 クイックスタート
+## 🚀 Quick Start
 
-### 1. 依存関係のインストール
+### 1. Install Dependencies
 
-プロジェクトルートから実行:
+Run from the repository root:
 
 ```bash
 pnpm install
 ```
 
-### 2. 開発サーバーの起動
+### 2. Start the Development Server
 
 ```bash
 pnpm --filter rivet-image-optimization dev
 ```
 
-### 3. ビルド
+### 3. Build
 
 ```bash
 pnpm --filter rivet-image-optimization build
 ```
 
-### 4. テストの実行
+### 4. Run Tests
 
-Vitest による画像変換および SQLite キャッシュの自動テスト:
+Run automated tests for image conversion and SQLite caching using Vitest:
 
 ```bash
 pnpm --filter rivet-image-optimization test
@@ -47,87 +47,88 @@ pnpm --filter rivet-image-optimization test
 
 ---
 
-## 🚢 デプロイ方法
+## 🚢 Deployment
 
-環境に応じて以下の2つのデプロイ方法が選択できます。
+Two deployment methods are available depending on your target environment:
 
-### 方法 1: Rivet Cloud / Rivet CLI でデプロイ（推奨）
+### Method 1: Deploy with Rivet Cloud / Rivet CLI (Recommended)
 
-Rivet 公式のマネージド環境へデプロイする場合：
+To deploy to Rivet Cloud's managed cluster:
 
-1. **Rivet CLI のインストール & ログイン**:
+1. **Install Rivet CLI & Sign in**:
    ```bash
    npx @rivetkit/cli login
    ```
-2. **プロジェクトのリンク**:
+2. **Link the Project**:
    ```bash
    cd rivet-image-optimization
    npx @rivetkit/cli link
    ```
-3. **デプロイの実行**:
+   *(Or configure `.rivet/project.json` based on `.rivet/project.json.example`)*
+3. **Deploy**:
    ```bash
    npx @rivetkit/cli deploy
    ```
-4. **CI/CD（GitHub Actions）の自動設定**:
+4. **Automate CI/CD with GitHub Actions**:
    ```bash
    npx @rivetkit/cli setup-ci
    ```
-   ※ 本番環境ではクラスタから自動的に `RIVET_ENDPOINT` が注入され、Actor が起動します。
+   *Note: In production environments, `RIVET_ENDPOINT` is automatically injected by the cluster to launch the Actor.*
 
 ---
 
-### 方法 2: Docker / クラウド PaaS（Railway, Render, Fly.io, VPS）へデプロイ
+### Method 2: Deploy with Docker / Cloud PaaS (Railway, Render, Fly.io, VPS)
 
-Docker コンテナとしてスタンドアロンに常駐起動する場合：
+To deploy as a standalone resident container:
 
-1. **Docker イメージのビルド**:
+1. **Build the Docker Image**:
    ```bash
    cd rivet-image-optimization
    docker build -t rivet-image-optimization .
    ```
-2. **コンテナの実行**:
+2. **Run the Container**:
    ```bash
    docker run -d -p 3000:3000 --name image-optimizer rivet-image-optimization
    ```
-3. **Railway / Render 等の PaaS**:
-   - リポジトリを連携し、`rivet-image-optimization/Dockerfile`（ビルドコンテキスト: `rivet-image-optimization`）を指定するだけで自動ビルド・デプロイされます。
-   - ポート `3000` で画像最適化プロキシとして即座に利用可能になります。
+3. **PaaS (Railway, Render, etc.)**:
+   - Connect your Git repository and set the root/context to `rivet-image-optimization/Dockerfile` (context: `rivet-image-optimization`).
+   - The image optimization proxy will be immediately accessible on port `3000`.
 
 ---
 
-## 🔌 API 仕様
+## 🔌 API Specification
 
-### HTTP エンドポイント (`onRequest`)
+### HTTP Endpoint (`onRequest`)
 
 ```http
 GET /?url=<IMAGE_URL>&w=<WIDTH>&q=<QUALITY>&type=<FORMAT>
 ```
 
-#### クエリパラメータ
+#### Query Parameters
 
-| パラメータ | 必須 | デフォルト | 説明 |
+| Parameter | Required | Default | Description |
 | :--- | :---: | :--- | :--- |
-| `url` | **Yes** | - | 最適化対象の元画像 URL（有効な URL 形式） |
-| `w` | No | 原寸 | リサイズ後の幅（px） |
-| `q` | No | 自動 | 画質（1〜100） |
-| `type` | No | 自動ネゴシエーション | 出力フォーマット（`avif`, `webp`, `png`, `jpeg`） |
+| `url` | **Yes** | - | Target source image URL (must be a valid URL) |
+| `w` | No | Original size | Resized image width (px) |
+| `q` | No | Auto | Image quality (1–100) |
+| `type` | No | Auto-negotiated | Output format (`avif`, `webp`, `png`, `jpeg`) |
 
-#### フォーマット自動ネゴシエーション
+#### Format Auto-Negotiation
 
-`type` パラメータが省略された場合、リクエストの `Accept` ヘッダーに応じて最適なフォーマットを自動選択します:
+If the `type` parameter is omitted, the optimal format is automatically determined based on the request's `Accept` header and the source image type:
 
-1. `Accept: image/avif` を含む場合 → **AVIF**
-2. `Accept: image/webp` を含む場合 → **WebP**
-3. 元画像が `image/jpeg` の場合 → **JPEG**
-4. その他 → **PNG**
+1. If `Accept: image/avif` is present → **AVIF**
+2. If `Accept: image/webp` is present → **WebP**
+3. If source image is `image/jpeg` → **JPEG**
+4. Otherwise → **PNG**
 
-※ `image/svg+xml` および `image/gif` は変換されず、原画像のまま返却されます。
+*Note: `image/svg+xml` and `image/gif` are returned as-is without re-encoding.*
 
 ---
 
-## 💻 Next.js との連携例
+## 💻 Next.js Integration Example
 
-Next.js の `next.config.js` でカスタムローダーを設定することで、`next/image` のリクエスト先として利用できます:
+Configure a custom loader in Next.js (`next.config.js`) to route `next/image` requests through the optimizer:
 
 ```javascript
 // next.config.js
@@ -147,26 +148,26 @@ export default function rivetImageLoader({ src, width, quality }) {
     w: width.toString(),
     q: (quality || 75).toString(),
   });
-  return `http://localhost:6420/gateway/imageOptimizer/request?${params.toString()}`;
+  return `http://localhost:3000/?${params.toString()}`;
 }
 ```
 
 ---
 
-## 📁 ディレクトリ構成
+## 📁 Directory Structure
 
 ```
 rivet-image-optimization/
 ├── .rivet/
-│   └── project.json.example  # Rivet クラスタ・組織リンク設定のサンプル
+│   └── project.json.example  # Sample Rivet cluster/org link configuration
 ├── src/
-│   ├── index.ts              # ImageOptimizer Actor 本体、SQLiteキャッシュ、最適化ロジック
-│   └── server.ts             # ローカル開発・スタンドアロン実行用 HTTP サーバー
+│   ├── index.ts              # ImageOptimizer Actor implementation, SQLite cache, and core optimization logic
+│   └── server.ts             # Local development and standalone HTTP server
 ├── tests/
-│   └── index.test.ts         # Vitest による単体・統合テスト
-├── images/                   # テスト用画像アセット
-├── Dockerfile                # マルチステージビルド対応 Dockerfile
-├── package.json              # 依存関係およびスクリプト
-├── tsconfig.json             # TypeScript 設定
+│   └── index.test.ts         # Unit & integration tests with Vitest
+├── images/                   # Sample image assets for testing
+├── Dockerfile                # Multi-stage build Dockerfile
+├── package.json              # Dependencies and scripts
+├── tsconfig.json             # TypeScript configuration
 └── README.md
 ```
