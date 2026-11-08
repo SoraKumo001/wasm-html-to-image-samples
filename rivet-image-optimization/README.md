@@ -82,15 +82,15 @@ Docker コンテナとしてスタンドアロンに常駐起動する場合：
 
 1. **Docker イメージのビルド**:
    ```bash
-   # リポジトリルートからビルド
-   docker build -t rivet-image-optimization -f rivet-image-optimization/Dockerfile .
+   cd rivet-image-optimization
+   docker build -t rivet-image-optimization .
    ```
 2. **コンテナの実行**:
    ```bash
    docker run -d -p 3000:3000 --name image-optimizer rivet-image-optimization
    ```
 3. **Railway / Render 等の PaaS**:
-   - リポジトリを連携し、ルートディレクトリまたは `rivet-image-optimization/Dockerfile` を指定するだけで自動ビルド・デプロイされます。
+   - リポジトリを連携し、`rivet-image-optimization/Dockerfile`（ビルドコンテキスト: `rivet-image-optimization`）を指定するだけで自動ビルド・デプロイされます。
    - ポート `3000` で画像最適化プロキシとして即座に利用可能になります。
 
 ---
@@ -157,13 +157,16 @@ export default function rivetImageLoader({ src, width, quality }) {
 
 ```
 rivet-image-optimization/
+├── .rivet/
+│   └── project.json.example  # Rivet クラスタ・組織リンク設定のサンプル
 ├── src/
-│   └── index.ts        # ImageOptimizer Actor 本体、SQLiteキャッシュ、onRequest ハンドラ
+│   ├── index.ts              # ImageOptimizer Actor 本体、SQLiteキャッシュ、最適化ロジック
+│   └── server.ts             # ローカル開発・スタンドアロン実行用 HTTP サーバー
 ├── tests/
-│   └── index.test.ts   # Vitest による単体・統合テスト
-├── images/             # テスト用画像アセット
-├── package.json        # 依存関係およびスクリプト
-├── tsconfig.json       # TypeScript 設定
-├── rivet.json          # Rivet Actors 設定ファイル
+│   └── index.test.ts         # Vitest による単体・統合テスト
+├── images/                   # テスト用画像アセット
+├── Dockerfile                # マルチステージビルド対応 Dockerfile
+├── package.json              # 依存関係およびスクリプト
+├── tsconfig.json             # TypeScript 設定
 └── README.md
 ```
