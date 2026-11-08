@@ -1,6 +1,7 @@
 node_modules
 dist
-.rivet
+.rivet/*
+!.rivet/*.example
 .image-cache.sqlite
 .ogp-cache.sqlite
 .env

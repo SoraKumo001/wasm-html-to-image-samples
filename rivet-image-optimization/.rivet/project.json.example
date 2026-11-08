@@ -1,4 +1,4 @@
 {
-  "cluster": "cloud",
+  "cluster": "YOUR_CLUSTER",
   "org": "YOUR_ORGANIZATION_ID"
 }
