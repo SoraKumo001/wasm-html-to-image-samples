@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.image-cache.sqlite*
+.env*
+.rivet/*
+!.rivet/*.example
+
+

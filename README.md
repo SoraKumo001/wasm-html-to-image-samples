@@ -30,6 +30,8 @@ pnpm -r build
 | [**`node-image-convert`**](./node-image-convert/)                 | CLI Batch Converter         | Node.js (ESM)               | TypeScript (`tsc -b`), tsx  | `wasm-html-to-image/single`<br>`wasm-html-to-image/workers`                                  |
 | [**`cloudflare-ogp`**](./cloudflare-ogp/)                         | Dynamic OGP Generator       | Cloudflare Workers (Hono)   | Wrangler                    | `wasm-html-to-image/workerd`<br>`wasm-html-to-image/tailwind` |
 | [**`cloudflare-mermaid`**](./cloudflare-mermaid/)                 | On-the-fly Mermaid API      | Cloudflare Workers (workerd)| Wrangler                    | `wasm-html-to-image/workerd`                                                                 |
+| [**`cloudflare-image-optimization`**](./cloudflare-image-optimization/) | Edge Image Optimizer Proxy  | Cloudflare Workers (workerd)| Wrangler                    | `wasm-html-to-image/workerd`                                                                 |
+| [**`rivet-image-optimization`**](./rivet-image-optimization/)     | Stateful Image Optimizer    | Rivet Actors (RivetKit)     | TypeScript (`tsc`), tsx     | `wasm-html-to-image`                                                                         |
 
 ---
 
@@ -207,4 +209,24 @@ Render an HTML card on a plain 2D canvas: live DOM via `content="drawable"` when
   # Cloudflare Workers (Static Assets)
   pnpm --filter canvas-image-effects deploy
   ```
+
+---
+
+### 11. [rivet-image-optimization](./rivet-image-optimization/)
+
+Image optimization service running on [Rivet Actors](https://rivet.dev/) with durable SQLite caching.
+
+- **Runtime**: Rivet Actors (RivetKit) / Node.js
+- **Build Tool**: TypeScript (`tsc`), tsx, Vitest
+- **Package Feature**:
+  - Re-encodes and resizes images to AVIF, WebP, JPEG, and PNG using Universal `wasm-html-to-image`.
+  - Caches converted binary data and content types inside each actor's durable SQLite database (`rivetkit/db`).
+  - Supports standard HTTP request handler (`onRequest`) and typed RPC action (`optimize`).
+  - Passes through SVG and GIF images without unnecessary conversion.
+- **Run**:
+  ```bash
+  pnpm --filter rivet-image-optimization dev
+  pnpm --filter rivet-image-optimization test
+  ```
+
 

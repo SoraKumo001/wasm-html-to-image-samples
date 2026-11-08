@@ -1,0 +1,24 @@
+{
+  "name": "rivet-image-optimization",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "deploy": "rivet deploy",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "rivetkit": "^3.0.6",
+    "@rivetkit/rivetkit-wasm": "^3.0.6",
+    "wasm-html-to-image": "^1.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^3.0.0"
+  }
+}
